@@ -41,8 +41,6 @@ function agregarAlCarrito(id, nombre, precio) {
     actualizarCarrito();
 }
 
-
-
 function actualizarCarrito() {
     const tablaCarrito = document.getElementById('carrito-lista');
     tablaCarrito.innerHTML = '';
@@ -63,95 +61,6 @@ function actualizarCarrito() {
         tablaCarrito.appendChild(fila);
     });
 }
-
-function aumentarCantidad(index) {
-    carrito[index].cantidad += 1;
-    actualizarCarrito();
-}
-
-function disminuirCantidad(index) {
-    if (carrito[index].cantidad > 1) {
-        carrito[index].cantidad -= 1;
-    } else {
-        carrito.splice(index, 1); // Elimina el producto si la cantidad llega a 0
-    }
-    actualizarCarrito();
-}
-
-
-function eliminarDelCarrito(index) {
-    carrito.splice(index, 1);
-    actualizarCarrito();
-}
-
-async function finalizarPedido() {
-    if (carrito.length === 0) {
-        alert("El carrito está vacío.");
-        return;
-    }
-
-    const descripcion = carrito.map(prod => `${prod.nombre} x${prod.cantidad}`).join(', ');
-    const total = carrito.reduce((sum, prod) => sum + (prod.precio * prod.cantidad), 0);
-    const id_cliente = localStorage.getItem('id_cliente');
-
-    if (!id_cliente) {
-        alert("Error: No hay cliente registrado.");
-        return;
-    }
-
-    const pedido = { descripcion, total, id_cliente };
-
-    console.log("📦 Enviando pedido:", pedido);
-
-    try {
-        const response = await fetch('/api/cliente/agregar-pedido-cliente', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(pedido)
-        });
-
-        const data = await response.json();
-        console.log("📩 Respuesta del servidor:", data);
-
-        if (data.success) {
-            const idPedido = data.id_pedido; // Asegúrate de que el backend devuelva el ID
-            mostrarModalPago(idPedido);
-
-            carrito = [];
-            actualizarCarrito();
-        } else {
-            alert("Error al realizar el pedido.");
-        }
-    } catch (error) {
-        console.error("❌ Error al finalizar el pedido:", error);
-    }
-}
-
-// Función para mostrar el modal de pago
-function mostrarModalPago(idPedido) {
-    const modalPago = document.getElementById('modalPago');
-    const detallesPago = document.getElementById('detallePago');
-
-    detallesPago.innerHTML = `
-        <p><strong>Transferencia:</strong> 23456788765432234</p>
-        <p><strong>Enviar al número:</strong> 5565544395</p>
-        <p><strong>Colocar el ID del pedido en Concepto:</strong> <span style="color: red;">${idPedido}</span></p>
-        <p><em>Se puede visualizar en "Ver Pedido".</em></p>
-    `;
-
-    modalPago.style.display = 'block';
-}
-
-// Función para cerrar el modal
-function cerrarModalPago() {
-    document.getElementById('modalPago').style.display = 'none';
-}
-
-
-
-
-
-obtenerProductos();
 
 async function verPedido() {
     const id_cliente = localStorage.getItem('id_cliente');
@@ -175,7 +84,6 @@ async function verPedido() {
     }
 }
 
-
 function mostrarPedidosEnModal(pedidos) {
     const detallePedido = document.getElementById('detallePedido');
     
@@ -191,8 +99,4 @@ function mostrarPedidosEnModal(pedidos) {
     }
 
     document.getElementById('modalPedido').style.display = 'block';
-}
-
-function cerrarModal() {
-    document.getElementById('modalPedido').style.display = 'none';
 }
