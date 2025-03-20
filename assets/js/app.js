@@ -15,20 +15,21 @@ async function obtenerProductos() {
 }
 
 function mostrarProductos(productos) {
-    console.log("Productos recibidos:", productos); // Agrega este log
+    console.log("Productos recibidos:", productos); // Verificación
     const tabla = document.getElementById('productos-lista');
-    tabla.innerHTML = ''; // Evitar duplicados
-    
+    tabla.innerHTML = ''; // Limpiar la tabla
+
     productos.forEach(producto => {
         const fila = document.createElement('tr');
         fila.innerHTML = `
             <td>${producto.Nombre}</td>
-            <td>$${producto.Precio.toFixed(2)}</td>
-            <td><button onclick="agregarAlCarrito(${producto.ID_Producto}, '${producto.Nombre}', ${producto.Precio})">Añadir</button></td>
+            <td>$${parseFloat(producto.Precio).toFixed(2)}</td>
+            <td><button onclick="agregarAlCarrito(${producto.ID_Producto}, '${producto.Nombre}', ${parseFloat(producto.Precio)})">Añadir</button></td>
         `;
         tabla.appendChild(fila);
     });
 }
+
 
 
 function agregarAlCarrito(id, nombre, precio) {
