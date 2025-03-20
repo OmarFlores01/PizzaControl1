@@ -105,26 +105,51 @@ async function finalizarPedido() {
     };
 
     try {
-        const response = await fetch('/api/pedidos/finalizar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(pedido)
-        });
+    const response = await fetch('/api/pedidos/finalizar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pedido)
+    });
 
-        const data = await response.json();
-
-        if (data.success) {
-            alert("Pedido finalizado correctamente.");
-            carrito = []; // Vaciar carrito
-            actualizarCarrito();
-        } else {
-            alert(`Error al finalizar el pedido: ${data.message || "Error desconocido."}`);
-        }
-    } catch (error) {
-        console.error("Error al finalizar el pedido:", error);
-        alert("Ocurrió un error al finalizar el pedido. Inténtalo más tarde.");
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    const data = await response.json();
+
+    if (data.success) {
+        alert("Pedido finalizado correctamente.");
+        carrito = []; // Vaciar carrito
+        actualizarCarrito();
+    } else {
+        alert(`Error al finalizar el pedido: ${data.message || "Error desconocido."}`);
+    }
+} catch (error) {
+    console.error("Error al finalizar el pedido:", error);
+    alert("Ocurrió un error al finalizar el pedido. Inténtalo más tarde.");
 }
+
+}
+
+function eliminarDelCarrito(index) {
+    carrito.splice(index, 1);
+    actualizarCarrito();
+}
+
+function aumentarCantidad(index) {
+    carrito[index].cantidad += 1;
+    actualizarCarrito();
+}
+
+function disminuirCantidad(index) {
+    if (carrito[index].cantidad > 1) {
+        carrito[index].cantidad -= 1;
+    } else {
+        eliminarDelCarrito(index);
+    }
+    actualizarCarrito();
+}
+
 
 
 async function verPedido() {
