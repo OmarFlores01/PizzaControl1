@@ -196,3 +196,7 @@ function mostrarPedidosEnModal(pedidos) {
 
     document.getElementById('modalPedido').style.display = 'block';
 }
+function cerrarModal() {
+    document.getElementById('modalPedido').style.display = 'none';
+}
+
