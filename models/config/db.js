@@ -2,6 +2,7 @@ require('dotenv').config(); // Cargar las variables de entorno
 
 const mysql = require('mysql2'); // Usar mysql2 en lugar de mysql
 
+// Crear el pool de conexiones
 const db = mysql.createPool({
     connectionLimit: 10,  // Número de conexiones en el pool
     host: process.env.DB_HOST,
@@ -11,7 +12,7 @@ const db = mysql.createPool({
     port: process.env.DB_PORT
 });
 
-// Test de conexión
+// Test de conexión utilizando el pool
 db.getConnection((err, connection) => {
     if (err) {
         console.error('❌ Error al conectar a la base de datos:', err);
