@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const db = require('./models/config/db'); // Asegúrate de que db esté bien importado
+require('dotenv').config();  // Cargar las variables de entorno desde el archivo .env
 
 const app = express();
 const PORT = 3000;
