@@ -1,18 +1,19 @@
-const mysql = require('mysql'); // carga el paquete mysql
+const mysql = require('mysql'); // Carga el paquete mysql
 
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',      // usuario de MySQL
-    password: '',      // contraseña 
-    database: 'pizzacontrol' // nombre de bd
+    host: 'mysql.railway.internal', // Host de Railway
+    user: 'root',                   // Usuario de Railway
+    password: 'hnctdwdlnuEmVnaWSDpVobLzMjKFmeDI', // Contraseña de Railway
+    database: 'railway',             // Nombre de la base de datos
+    port: 3306                       // Puerto de MySQL en Railway
 });
 
 db.connect((err) => {
     if (err) {
-        console.error('Error al conectar a la base de datos:', err);
+        console.error('❌ Error al conectar a MySQL en Railway:', err);
         return;
     }
-    console.log('Conectado a la base de datos MySQL');
+    console.log('✅ Conectado exitosamente a MySQL en Railway 🚀');
 });
 
 module.exports = db;
