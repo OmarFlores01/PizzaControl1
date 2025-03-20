@@ -1,19 +1,23 @@
+require('dotenv').config(); // Carga las variables de entorno desde .env
+
 const mysql = require('mysql'); // Carga el paquete mysql
 
+// Crear la conexión a la base de datos usando las variables de entorno
 const db = mysql.createConnection({
-    host: 'mysql.railway.internal', // Host de Railway
-    user: 'root',                   // Usuario de Railway
-    password: 'hnctdwdlnuEmVnaWSDpVobLzMjKFmeDI', // Contraseña de Railway
-    database: 'railway',             // Nombre de la base de datos
-    port: 3306                       // Puerto de MySQL en Railway
+    host: process.env.DB_HOST,       // Host de la base de datos
+    user: process.env.DB_USER,       // Usuario de la base de datos
+    password: process.env.DB_PASSWORD, // Contraseña de la base de datos
+    database: process.env.DB_DATABASE, // Nombre de la base de datos
+    port: process.env.DB_PORT        // Puerto de la base de datos
 });
 
+// Intentar conectar a la base de datos
 db.connect((err) => {
     if (err) {
-        console.error('❌ Error al conectar a MySQL en Railway:', err);
+        console.error('❌ Error al conectar a MySQL:', err);
         return;
     }
-    console.log('✅ Conectado exitosamente a MySQL en Railway 🚀');
+    console.log('✅ Conectado exitosamente a MySQL 🚀');
 });
 
 module.exports = db;
