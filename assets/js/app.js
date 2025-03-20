@@ -15,6 +15,7 @@ async function obtenerProductos() {
 }
 
 function mostrarProductos(productos) {
+    console.log("Productos recibidos:", productos); // Agrega este log
     const tabla = document.getElementById('productos-lista');
     tabla.innerHTML = ''; // Evitar duplicados
     
@@ -28,6 +29,7 @@ function mostrarProductos(productos) {
         tabla.appendChild(fila);
     });
 }
+
 
 function agregarAlCarrito(id, nombre, precio) {
     let productoEnCarrito = carrito.find(producto => producto.id === id);
