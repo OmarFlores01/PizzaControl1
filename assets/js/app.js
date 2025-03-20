@@ -47,16 +47,19 @@ function mostrarProductos(productos) {
 
 
 function agregarAlCarrito(id, nombre, precio) {
+    console.log("Añadiendo al carrito:", { id, nombre, precio }); // Depuración
+
     let productoEnCarrito = carrito.find(producto => producto.id === id);
 
     if (productoEnCarrito) {
-        productoEnCarrito.cantidad += 1; 
+        productoEnCarrito.cantidad += 1;
     } else {
-        carrito.push({ id, nombre, precio, cantidad: 1 }); 
+        carrito.push({ id, nombre, precio, cantidad: 1 });
     }
 
     actualizarCarrito();
 }
+
 
 function actualizarCarrito() {
     const tablaCarrito = document.getElementById('carrito-lista');
