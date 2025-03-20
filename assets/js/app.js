@@ -15,17 +15,17 @@ async function obtenerProductos() {
 }
 
 function mostrarProductos(productos) {
-    console.log("Productos recibidos:", productos);
+    console.log("Entré a mostrarProductos con productos:", productos);
+    
     const tabla = document.getElementById('productos-lista');
-    tabla.innerHTML = ''; // Limpiar la tabla
+    tabla.innerHTML = ''; // Limpiar tabla
 
     productos.forEach(producto => {
-        console.log(`Precio del producto ${producto.Nombre}:`, producto.Precio, typeof producto.Precio);
-        
-        const precio = parseFloat(producto.Precio); // Convertir Precio a número
+        console.log(`Producto: ${producto.Nombre}, Precio: ${producto.Precio}`);
+        const precio = parseFloat(producto.Precio);
 
         if (isNaN(precio)) {
-            console.error(`❌ Error: Precio inválido para ${producto.Nombre}`);
+            console.error(`❌ Precio inválido para ${producto.Nombre}:`, producto.Precio);
             return;
         }
 
@@ -39,6 +39,7 @@ function mostrarProductos(productos) {
         tabla.appendChild(fila);
     });
 }
+
 
 
 
