@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors'); // Middleware que permite hacer peticiones
 const path = require('path'); // Módulo de Node.js para manejar rutas de archivos y directorios.
-const db = require('./db'); // Importa la conexión a la base de datos
+const db = require('./models/config/db'); // Ajusta la ruta correctamente
 
 // Cada archivo en routes/ contiene las definiciones de las rutas para diferentes partes del sistema
 const authRoutes = require('./routes/authRoutes');
