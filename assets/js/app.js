@@ -84,6 +84,49 @@ function actualizarCarrito() {
     });
 }
 
+async function finalizarPedido() {
+    if (carrito.length === 0) {
+        alert("El carrito está vacío.");
+        return;
+    }
+
+    const id_cliente = localStorage.getItem('id_cliente');
+    if (!id_cliente) {
+        alert("Error: No hay cliente registrado.");
+        return;
+    }
+
+    const pedido = {
+        id_cliente: id_cliente,
+        productos: carrito.map(producto => ({
+            id_producto: producto.id,
+            cantidad: producto.cantidad
+        }))
+    };
+
+    try {
+        const response = await fetch('/api/pedidos/finalizar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(pedido)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert("Pedido finalizado correctamente.");
+            carrito = []; // Vaciar carrito
+            actualizarCarrito();
+        } else {
+            alert(`Error al finalizar el pedido: ${data.message || "Error desconocido."}`);
+        }
+    } catch (error) {
+        console.error("Error al finalizar el pedido:", error);
+        alert("Ocurrió un error al finalizar el pedido. Inténtalo más tarde.");
+    }
+}
+
+
 async function verPedido() {
     const id_cliente = localStorage.getItem('id_cliente');
 
