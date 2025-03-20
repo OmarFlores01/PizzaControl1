@@ -21,8 +21,7 @@ function mostrarProductos(productos) {
     tabla.innerHTML = ''; // Limpiar tabla
 
     productos.forEach(producto => {
-        console.log(`Producto: ${producto.Nombre}, Precio: ${producto.Precio}`);
-        const precio = parseFloat(producto.Precio);
+        const precio = Number(producto.Precio);
 
         if (isNaN(precio)) {
             console.error(`❌ Precio inválido para ${producto.Nombre}:`, producto.Precio);
@@ -33,12 +32,16 @@ function mostrarProductos(productos) {
         fila.innerHTML = `
             <td>${producto.Nombre}</td>
             <td>$${precio.toFixed(2)}</td>
-            <td><button onclick="agregarAlCarrito(${producto.ID_Producto}, '${producto.Nombre}', ${precio})">Añadir</button></td>
+            <td>
+                <button onclick="agregarAlCarrito(${producto.ID_Producto}, ${JSON.stringify(producto.Nombre)}, ${precio})">Añadir</button>
+            </td>
         `;
 
         tabla.appendChild(fila);
     });
 }
+        window.addEventListener('DOMContentLoaded', obtenerProductos);
+
 
 
 
