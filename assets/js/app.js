@@ -29,13 +29,14 @@ function mostrarProductos(productos) {
         }
 
         const fila = document.createElement('tr');
-        fila.innerHTML = `
-            <td>${producto.Nombre}</td>
-            <td>$${precio.toFixed(2)}</td>
-            <td>
-                <button onclick="agregarAlCarrito(${producto.ID_Producto}, ${JSON.stringify(producto.Nombre)}, ${precio})">Añadir</button>
-            </td>
-        `;
+            fila.innerHTML = `
+                <td>${producto.Nombre}</td>
+                <td>$${precio.toFixed(2)}</td>
+                <td>
+                    <button onclick='agregarAlCarrito(${producto.ID_Producto}, "${producto.Nombre.replace(/"/g, '\\"')}", ${precio})'>Añadir</button>
+                </td>
+            `;
+
 
         tabla.appendChild(fila);
     });
@@ -47,8 +48,8 @@ function mostrarProductos(productos) {
 
 
 function agregarAlCarrito(id, nombre, precio) {
-    console.log("Añadiendo al carrito:", { id, nombre, precio }); // Depuración
-
+    console.log(`Añadiendo al carrito - ID: ${id}, Nombre: ${nombre}, Precio: ${precio}`);
+    
     let productoEnCarrito = carrito.find(producto => producto.id === id);
 
     if (productoEnCarrito) {
@@ -59,6 +60,7 @@ function agregarAlCarrito(id, nombre, precio) {
 
     actualizarCarrito();
 }
+
 
 
 function actualizarCarrito() {
