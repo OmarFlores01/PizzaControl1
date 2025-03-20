@@ -1,12 +1,10 @@
 require('dotenv').config(); // Cargar las variables de entorno
-
 const mysql = require('mysql2'); // Usar mysql2 en lugar de mysql
 
-// Verificación de que las variables de entorno estén definidas
+// Verificar que las variables de entorno estén definidas
 if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_PASSWORD || !process.env.DB_DATABASE || !process.env.DB_PORT) {
-    console.error('❌ Faltan algunas variables de entorno para la conexión a la base de datos.');
-    process.exit(1);  // Salir si las variables necesarias no están definidas
-    
+    console.error('❌ Faltan variables de entorno para la conexión a la base de datos.');
+    process.exit(1); // Salir si las variables necesarias no están definidas
 }
 
 // Crear el pool de conexiones
@@ -19,10 +17,10 @@ const db = mysql.createPool({
     port: process.env.DB_PORT
 });
 
-// Test de conexión utilizando el pool
+// Probar la conexión
 db.getConnection((err, connection) => {
     if (err) {
-        console.error('❌ Error al conectar a la base de datos:', err);
+        console.error('❌ Error al conectar a la base de datos:', err.message);
         return;
     }
     console.log('✅ Conectado a la base de datos MySQL 🚀');
