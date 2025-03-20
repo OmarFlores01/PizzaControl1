@@ -43,17 +43,16 @@ router.get('/obtener-pedidos-cliente/:id_cliente', (req, res) => {
 });
 
 // Obtener productos
-router.get('/api/productos/obtener-productos', (req, res) => {
+router.get('/obtener-productos', (req, res) => {
     const query = `SELECT ID_Producto, Nombre, Precio FROM productos`;
-
     db.query(query, (err, results) => {
         if (err) {
             console.error('❌ Error al obtener productos:', err.message);
             return res.status(500).json({ success: false, message: 'Error al obtener productos' });
         }
-
         res.json({ success: true, productos: results });
     });
 });
+
 
 module.exports = router;
