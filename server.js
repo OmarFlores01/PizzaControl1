@@ -1,26 +1,10 @@
 const express = require('express');
-const cors = require('cors'); // Middleware que permite hacer peticiones
-const path = require('path'); // Módulo de Node.js para manejar rutas de archivos y directorios.
-const db = require('./models/config/db'); // Ajusta la ruta correctamente
-
-// Cada archivo en routes/ contiene las definiciones de las rutas para diferentes partes del sistema
-const authRoutes = require('./routes/authRoutes');
-const pedidoRoutes = require('./routes/pedidoRoutes');
-const productoRoutes = require('./routes/productoRoutes');
-const inventarioRoutes = require('./routes/inventarioRoutes');
-const clienteRoutes = require('./routes/clienteRoutes');
+const cors = require('cors');
+const path = require('path');
+const db = require('./models/config/db'); // Asegúrate de que db esté bien importado
 
 const app = express();
 const PORT = 3000;
-
-// Conectar con la base de datos al iniciar el servidor
-db.connect((err) => {
-    if (err) {
-        console.error('❌ Error al conectar a la base de datos:', err);
-        return;
-    }
-    console.log('✅ Conectado a la base de datos MySQL 🚀');
-});
 
 // Sirve archivos estáticos sean accesibles
 app.use(cors());
@@ -34,13 +18,22 @@ app.get('/', (req, res) => {
 });
 
 // Rutas para interactuar con el servidor
-app.use('/api/auth', authRoutes);
-app.use('/api/pedidos', pedidoRoutes);
-app.use('/api/productos', productoRoutes);
-app.use('/api/inventario', inventarioRoutes);
-app.use('/api/cliente', clienteRoutes);
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/pedidos', require('./routes/pedidoRoutes'));
+app.use('/api/productos', require('./routes/productoRoutes'));
+app.use('/api/inventario', require('./routes/inventarioRoutes'));
+app.use('/api/cliente', require('./routes/clienteRoutes'));
 
 // Inicia el servidor
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
+
+    // Ejemplo de uso de la base de datos, solo para probar si está funcionando
+    db.query('SELECT 1', (err, result) => {
+        if (err) {
+            console.error('❌ Error en la consulta:', err);
+        } else {
+            console.log('✅ Conexión a la base de datos exitosa.');
+        }
+    });
 });
