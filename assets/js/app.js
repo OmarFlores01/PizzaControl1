@@ -15,17 +15,27 @@ async function obtenerProductos() {
 }
 
 function mostrarProductos(productos) {
-    console.log("Productos recibidos:", productos); // Verificación
+    console.log("Productos recibidos:", productos);
     const tabla = document.getElementById('productos-lista');
     tabla.innerHTML = ''; // Limpiar la tabla
 
     productos.forEach(producto => {
+        console.log(`Precio del producto ${producto.Nombre}:`, producto.Precio, typeof producto.Precio);
+        
+        const precio = parseFloat(producto.Precio); // Convertir Precio a número
+
+        if (isNaN(precio)) {
+            console.error(`❌ Error: Precio inválido para ${producto.Nombre}`);
+            return;
+        }
+
         const fila = document.createElement('tr');
         fila.innerHTML = `
             <td>${producto.Nombre}</td>
-            <td>$${parseFloat(producto.Precio).toFixed(2)}</td>
-            <td><button onclick="agregarAlCarrito(${producto.ID_Producto}, '${producto.Nombre}', ${parseFloat(producto.Precio)})">Añadir</button></td>
+            <td>$${precio.toFixed(2)}</td>
+            <td><button onclick="agregarAlCarrito(${producto.ID_Producto}, '${producto.Nombre}', ${precio})">Añadir</button></td>
         `;
+
         tabla.appendChild(fila);
     });
 }
