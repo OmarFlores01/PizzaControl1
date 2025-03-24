@@ -162,7 +162,9 @@ async function verPedido() {
         const response = await fetch(`/api/cliente/obtener-pedidos-cliente/${id_cliente}`);
         const data = await response.json();
 
-        if (data.success) {
+        console.log("📌 Datos obtenidos del pedido:", data); // ✅ Verifica la respuesta
+
+        if (data.success && data.pedidos.length > 0) {
             mostrarPedidosEnModal(data.pedidos);
         } else {
             alert("No se encontraron pedidos.");
@@ -172,38 +174,52 @@ async function verPedido() {
     }
 }
 
+
 function mostrarPedidosEnModal(pedidos) {
     const detallePedido = document.getElementById('detallePedido');
     
+    console.log("📌 Pedidos recibidos para el modal:", pedidos); // ✅ Verifica que hay datos
+
     if (pedidos.length === 0) {
         detallePedido.innerHTML = "<p>No hay pedidos registrados.</p>";
     } else {
         let contenido = "<ul>";
         pedidos.forEach(pedido => {
             contenido += `<li>
-                <strong>ID:</strong> ${pedido.ID_Pedido} | 
-                <strong>Descripción:</strong> ${pedido.Descripcion} | 
-                <strong>Total:</strong> $${Number(pedido.Total).toFixed(2)} | 
-                <strong>Estado:</strong> ${pedido.Estado} | 
-                <strong>Fecha:</strong> ${pedido.Fecha}
+                <strong>ID:</strong> ${pedido.ID_Pedido} <br>
+                <strong>Descripción:</strong> ${pedido.Descripcion} <br>
+                <strong>Total:</strong> $${Number(pedido.Total).toFixed(2)} <br>
+                <strong>Estado:</strong> ${pedido.Estado} <br>
+                <strong>Fecha:</strong> ${pedido.Fecha} <br><br>
             </li>`;
         });
         contenido += "</ul>";
         detallePedido.innerHTML = contenido;
     }
 
+    // ✅ Asegurar que el modal se muestra
+    document.getElementById('modalPedido').style.display = 'block';
+    console.log("✅ Modal de pedido mostrado");
+}
+
+
     // ✅ Mostrar el modal de pedidos
     document.getElementById('modalPedido').style.display = 'block';
 }
 
-// Funciones para cerrar los modales
-function cerrarModalPago() {
-    document.getElementById('modalPago').style.display = 'none';
+function cerrarModal() {
+    const modal = document.getElementById('modalPedido');
+    modal.style.display = 'none';
+    console.log("🚪 Modal cerrado");
 }
 
-function cerrarModal() {
-    document.getElementById('modalPedido').style.display = 'none';
+function verPedido() {
+    const modal = document.getElementById('modalPedido');
+    modal.style.display = 'block';
+    console.log("✅ Modal de pedido abierto");
 }
+
+
 
 function eliminarDelCarrito(index) {
     carrito.splice(index, 1);
