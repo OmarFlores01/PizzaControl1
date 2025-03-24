@@ -10,7 +10,7 @@ router.post('/agregar-pedido-cliente', (req, res) => {
         return res.status(400).json({ success: false, message: 'Faltan datos del pedido' });
     }
 
-    const query = INSERT INTO pedidos (ID_Cliente, Descripcion, Estado, Fecha, Total) VALUES (?, ?, 'Pendiente', NOW(), ?);
+const query = "INSERT INTO pedidos (ID_Cliente, Descripcion, Estado, Fecha, Total) VALUES (?, ?, 'Pendiente', NOW(), ?);";
 
     db.query(query, [id_cliente, descripcion, total], (err, result) => {
         if (err) {
