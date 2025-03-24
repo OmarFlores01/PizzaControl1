@@ -1,3 +1,81 @@
+let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+// Función para agregar productos al carrito
+function agregarAlCarrito(id, nombre, precio) {
+    let producto = carrito.find(p => p.id === id);
+    
+    if (producto) {
+        producto.cantidad++;
+    } else {
+        carrito.push({ id, nombre, precio, cantidad: 1 });
+    }
+
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    actualizarCarrito();
+}
+
+// Función para actualizar la tabla del carrito
+function actualizarCarrito() {
+    const tablaCarrito = document.getElementById('carrito-lista');
+    tablaCarrito.innerHTML = '';
+
+    carrito.forEach(producto => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${producto.nombre}</td>
+            <td>$${(producto.precio * producto.cantidad).toFixed(2)}</td>
+            <td>
+                <button onclick="eliminarDelCarrito(${producto.id})">❌</button>
+            </td>
+        `;
+        tablaCarrito.appendChild(fila);
+    });
+}
+
+// Función para eliminar producto del carrito
+function eliminarDelCarrito(id) {
+    carrito = carrito.filter(p => p.id !== id);
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    actualizarCarrito();
+}
+
+// Finalizar Pedido
+async function finalizarPedido() {
+    const id_cliente = localStorage.getItem('id_cliente'); // Obtener ID del cliente
+
+    if (!id_cliente || carrito.length === 0) {
+        alert("⚠️ No hay cliente registrado o el carrito está vacío.");
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/pedido/finalizar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_cliente, productos: carrito })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+            alert("✅ Pedido realizado con éxito");
+            localStorage.removeItem('carrito'); // Vaciar carrito
+            carrito = [];
+            actualizarCarrito();
+        } else {
+            alert("❌ Error al finalizar el pedido.");
+        }
+    } catch (error) {
+        console.error("❌ Error en la solicitud:", error);
+    }
+}
+
+// Cargar carrito al iniciar
+document.addEventListener("DOMContentLoaded", () => {
+    actualizarCarrito();
+});
+
+
 // Asegurar que los modales estén ocultos al cargar la página
 document.addEventListener("DOMContentLoaded", () => {
     const modales = ["modalPago", "modalPedido"];
