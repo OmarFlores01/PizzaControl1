@@ -25,6 +25,17 @@ app.use('/api/productos', require('./routes/productoRoutes'));
 app.use('/api/inventario', require('./routes/inventarioRoutes'));
 app.use('/api/cliente', require('./routes/clienteRoutes'));
 
+app.get('/descargar-menu', (req, res) => {
+    const menuPath = path.join(__dirname, 'assets/Menu/Menu.pdf');
+    res.download(menuPath, 'Menu.pdf', (err) => {
+        if (err) {
+            console.error('Error al descargar el menú:', err);
+            res.status(500).send('Error al descargar el menú');
+        }
+    });
+});
+
+
 // Inicia el servidor
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
