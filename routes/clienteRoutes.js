@@ -19,6 +19,8 @@ router.get('/obtener-productos', (req, res) => {
 router.post('/finalizar', (req, res) => {
     const { id_cliente, productos } = req.body;
 
+    console.log("📌 Datos recibidos en /finalizar:", req.body); // DEPURACIÓN
+
     if (!id_cliente || !productos || productos.length === 0) {
         return res.status(400).json({ success: false, message: 'Faltan datos del pedido' });
     }
@@ -38,6 +40,7 @@ router.post('/finalizar', (req, res) => {
         res.json({ success: true, message: 'Pedido finalizado exitosamente.', id_pedido: result.insertId });
     });
 });
+
 
 
     // **Corrección:** Asegurar que se usa `p.nombre`
