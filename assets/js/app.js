@@ -15,10 +15,8 @@ async function obtenerProductos() {
 }
 
 function mostrarProductos(productos) {
-    console.log("Entré a mostrarProductos con productos:", productos);
-
     const tabla = document.getElementById('productos-lista');
-    tabla.innerHTML = ''; // Limpiar tabla
+    tabla.innerHTML = '';
 
     productos.forEach(producto => {
         const precio = Number(producto.Precio);
@@ -45,8 +43,6 @@ function mostrarProductos(productos) {
 window.addEventListener('DOMContentLoaded', obtenerProductos);
 
 function agregarAlCarrito(id, nombre, precio) {
-    console.log(`Añadiendo al carrito - ID: ${id}, Nombre: ${nombre}, Precio: ${precio}`);
-
     if (!nombre || isNaN(precio)) {
         console.error("❌ No se puede agregar un producto inválido.");
         return;
@@ -144,4 +140,67 @@ async function finalizarPedido() {
         console.error("Error al finalizar el pedido:", error);
         alert(`Error al finalizar el pedido: ${error.message}`);
     }
+}
+
+// 💡 Función corregida para mostrar el modal de pago
+function mostrarModalPago(id_pedido, total) {
+    document.getElementById('modal-pedido-id').textContent = id_pedido;
+    document.getElementById('modal-total-pedido').textContent = total.toFixed(2);
+    document.getElementById('modalPago').style.display = 'block';
+}
+
+function cerrarModalPago() {
+    document.getElementById('modalPago').style.display = 'none';
+}
+
+// 💡 Función corregida para ver pedidos
+async function verPedido() {
+    const id_cliente = localStorage.getItem('id_cliente');
+
+    if (!id_cliente) {
+        alert("Error: No hay cliente registrado.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/cliente/obtener-pedidos-cliente/${id_cliente}`);
+        const data = await response.json();
+
+        if (data.success) {
+            mostrarPedidosEnModal(data.pedidos);
+        } else {
+            alert("No se encontraron pedidos.");
+        }
+    } catch (error) {
+        console.error("Error al obtener los pedidos:", error);
+    }
+}
+
+// 💡 Función corregida para mostrar pedidos en el modal
+function mostrarPedidosEnModal(pedidos) {
+    const listaPedidos = document.getElementById('lista-pedidos');
+    listaPedidos.innerHTML = '';
+
+    if (pedidos.length === 0) {
+        listaPedidos.innerHTML = "<li>No tienes pedidos realizados.</li>";
+    } else {
+        pedidos.forEach(pedido => {
+            const itemPedido = document.createElement('li');
+            itemPedido.innerHTML = `
+                <strong>ID:</strong> ${pedido.ID_Pedido} | 
+                <strong>Descripción:</strong> ${pedido.Descripcion} | 
+                <strong>Total:</strong> $${pedido.Total.toFixed(2)} | 
+                <strong>Estado:</strong> ${pedido.Estado} | 
+                <strong>Fecha:</strong> ${pedido.Fecha}
+            `;
+            listaPedidos.appendChild(itemPedido);
+        });
+    }
+
+    document.getElementById('modalPedido').style.display = 'block';
+}
+
+// 💡 Función para cerrar modal de pedidos
+function cerrarModal() {
+    document.getElementById('modalPedido').style.display = 'none';
 }
