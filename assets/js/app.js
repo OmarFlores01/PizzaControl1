@@ -122,6 +122,7 @@ async function finalizarPedido() {
                 <p>Pedido finalizado correctamente.</p>
                 <p><strong>ID Pedido:</strong> ${data.id_pedido}</p>
                 <p><strong>Total:</strong> $${pedido.productos.reduce((sum, p) => sum + p.precio * p.cantidad, 0).toFixed(2)}</p>
+                <p><strong>Cuenta de Transferencia:</strong> 123456789876543</p>
             `;
 
             modalPago.style.display = 'block';
