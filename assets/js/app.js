@@ -29,13 +29,14 @@ console.error(`❌ Precio inválido para ${producto.Nombre}: ${producto.Precio}`
         }
 
         const fila = document.createElement('tr');
-            fila.innerHTML = 
-                <td>${producto.Nombre}</td>
-                <td>$${precio.toFixed(2)}</td>
-                <td>
-                    <button onclick='agregarAlCarrito(${producto.ID_Producto}, "${producto.Nombre.replace(/"/g, '\\"')}", ${precio})'>Añadir</button>
-                </td>
-            ;
+fila.innerHTML = 
+    <td>${producto.Nombre}</td>
+    <td>$${precio.toFixed(2)}</td>
+    <td>
+        <button onclick='agregarAlCarrito(${producto.ID_Producto}, "${producto.Nombre.replace(/"/g, '\\"')}", ${precio})'>Añadir</button>
+    </td>
+;
+
 
 
         tabla.appendChild(fila);
