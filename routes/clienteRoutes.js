@@ -10,9 +10,9 @@ router.post('/agregar-pedido-cliente', (req, res) => {
         return res.status(400).json({ success: false, message: 'Faltan datos del pedido' });
     }
 
-const query = "SELECT ID_Pedido, Descripcion, Estado, Fecha, Total FROM pedidos WHERE ID_Cliente = ? ORDER BY Fecha DESC;";
+    const query = "SELECT ID_Pedido, Descripcion, Estado, Fecha, Total FROM pedidos WHERE ID_Cliente = ? ORDER BY Fecha DESC;";
 
-    db.query(query, [id_cliente, descripcion, total], (err, result) => {
+    db.query(query, [id_cliente], (err, result) => { // Cambié los parámetros para que coincidan con la consulta
         if (err) {
             console.error('❌ Error al agregar el pedido:', err.message);
             return res.status(500).json({ success: false, message: 'Error al realizar el pedido' });
@@ -26,7 +26,7 @@ const query = "SELECT ID_Pedido, Descripcion, Estado, Fecha, Total FROM pedidos 
 router.get('/obtener-pedidos-cliente/:id_cliente', (req, res) => {
     const { id_cliente } = req.params;
 
-    const query = SELECT ID_Pedido, Descripcion, Estado, Fecha, Total FROM pedidos WHERE ID_Cliente = ? ORDER BY Fecha DESC;
+    const query = "SELECT ID_Pedido, Descripcion, Estado, Fecha, Total FROM pedidos WHERE ID_Cliente = ? ORDER BY Fecha DESC;";
 
     db.query(query, [id_cliente], (err, results) => {
         if (err) {
@@ -44,7 +44,7 @@ router.get('/obtener-pedidos-cliente/:id_cliente', (req, res) => {
 
 // Obtener productos
 router.get('/obtener-productos', (req, res) => {
-    const query = SELECT ID_Producto, Nombre, Precio FROM productos;
+    const query = "SELECT ID_Producto, Nombre, Precio FROM productos;";
     db.query(query, (err, results) => {
         if (err) {
             console.error('❌ Error al obtener productos:', err.message);
@@ -55,8 +55,6 @@ router.get('/obtener-productos', (req, res) => {
 });
 
 // Finalizar un pedido
-// Finalizar un pedido
-// Finalizar un pedido
 router.post('/finalizar', (req, res) => {
     const { id_cliente, productos } = req.body;
 
@@ -64,11 +62,10 @@ router.post('/finalizar', (req, res) => {
         return res.status(400).json({ success: false, message: 'Faltan datos del pedido' });
     }
 
-    const descripcion = productos.map(p => ${p.cantidad}x ${p.nombre}).join(', ');
+    const descripcion = productos.map(p => `${p.cantidad}x ${p.nombre}`).join(', ');
     const total = productos.reduce((sum, p) => sum + p.precio * p.cantidad, 0);
 
-    const query = INSERT INTO pedidos (ID_Cliente, Descripcion, Estado, Fecha, Total, ID_Empleado)
-                   VALUES (?, ?, 'En preparación', NOW(), ?, NULL);
+    const query = "INSERT INTO pedidos (ID_Cliente, Descripcion, Estado, Fecha, Total, ID_Empleado) VALUES (?, ?, 'En preparación', NOW(), ?, NULL);";
 
     db.query(query, [id_cliente, descripcion, total], (err, result) => {
         if (err) {
@@ -87,9 +84,5 @@ router.post('/finalizar', (req, res) => {
         });
     });
 });
-
-
-
-
 
 module.exports = router;
