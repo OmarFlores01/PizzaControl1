@@ -115,7 +115,7 @@ async function finalizarPedido() {
             body: JSON.stringify(pedido)
         });
 
-        if (!response.ok) throw new Error(HTTP error! status: ${response.status} - ${response.statusText});
+if (!response.ok) throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
 
         const data = await response.json();
 
