@@ -1,12 +1,29 @@
 let carrito = [];
 
+document.addEventListener("DOMContentLoaded", function () {
+    // 🔹 Forzar ocultar los modales al inicio
+    document.getElementById('modalPago').style.display = 'none';
+    document.getElementById('modalPedido').style.display = 'none';
+
+    // 🔹 Verificar el estado del modal en la consola
+    console.log("Estado inicial del modalPago:", document.getElementById('modalPago').style.display);
+
+    // 🔹 Solución de último recurso para forzar la ocultación
+    setTimeout(() => {
+        document.getElementById('modalPago').style.display = 'none';
+    }, 100);
+
+    // 🔹 Cargar productos cuando la página se inicia
+    obtenerProductos();
+});
+
 async function obtenerProductos() {
     try {
         const response = await fetch('/api/productos/obtener-productos');
         const data = await response.json();
 
         if (data.success) {
-            console.log("Productos recibidos:", data.productos); // Para depuración
+            console.log("Productos recibidos:", data.productos);
             mostrarProductos(data.productos);
         } else {
             console.error("No se recibieron productos.");
@@ -18,7 +35,7 @@ async function obtenerProductos() {
 
 function mostrarProductos(productos) {
     const tabla = document.getElementById('productos-lista');
-    tabla.innerHTML = ''; // Limpiar tabla antes de agregar nuevos productos
+    tabla.innerHTML = '';
 
     productos.forEach(producto => {
         const precio = Number(producto.Precio);
@@ -40,8 +57,6 @@ function mostrarProductos(productos) {
         tabla.appendChild(fila);
     });
 }
-
-window.addEventListener('DOMContentLoaded', obtenerProductos);
 
 function agregarAlCarrito(id, nombre, precio) {
     console.log(`Añadiendo al carrito - ID: ${id}, Nombre: ${nombre}, Precio: ${precio}`);
@@ -111,7 +126,7 @@ async function finalizarPedido() {
         const data = await response.json();
 
         if (data.success) {
-            carrito = [];  // Vacía el carrito
+            carrito = [];  
             actualizarCarrito();
 
             // ✅ Mostrar modal con detalles del pedido
@@ -190,7 +205,6 @@ function cerrarModal() {
     document.getElementById('modalPedido').style.display = 'none';
 }
 
-
 function eliminarDelCarrito(index) {
     carrito.splice(index, 1);
     actualizarCarrito();
@@ -209,4 +223,3 @@ function disminuirCantidad(index) {
     }
     actualizarCarrito();
 }
-
