@@ -16,7 +16,7 @@ async function obtenerProductos() {
 
 function mostrarProductos(productos) {
     console.log("Entré a mostrarProductos con productos:", productos);
-    
+
     const tabla = document.getElementById('productos-lista');
     tabla.innerHTML = ''; // Limpiar tabla
 
@@ -24,33 +24,28 @@ function mostrarProductos(productos) {
         const precio = Number(producto.Precio);
 
         if (isNaN(precio)) {
-console.error(`❌ Precio inválido para ${producto.Nombre}: ${producto.Precio}`);
+            console.error(`❌ Precio inválido para ${producto.Nombre}: ${producto.Precio}`);
             return;
         }
 
-       const fila = document.createElement('tr');
-fila.innerHTML = `
-    <td>${producto.Nombre}</td>
-    <td>$${precio.toFixed(2)}</td>
-    <td>
-        <button onclick='agregarAlCarrito(${producto.ID_Producto}, "${producto.Nombre.replace(/"/g, '\\"')}", ${precio})'>Añadir</button>
-    </td>
-`;
-
-
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${producto.Nombre}</td>
+            <td>$${precio.toFixed(2)}</td>
+            <td>
+                <button onclick='agregarAlCarrito(${producto.ID_Producto}, "${producto.Nombre.replace(/"/g, '\\"')}", ${precio})'>Añadir</button>
+            </td>
+        `;
 
         tabla.appendChild(fila);
     });
 }
-        window.addEventListener('DOMContentLoaded', obtenerProductos);
 
-
-
-
+window.addEventListener('DOMContentLoaded', obtenerProductos);
 
 function agregarAlCarrito(id, nombre, precio) {
-    console.log(Añadiendo al carrito - ID: ${id}, Nombre: ${nombre}, Precio: ${precio});
-    
+    console.log(`Añadiendo al carrito - ID: ${id}, Nombre: ${nombre}, Precio: ${precio}`);
+
     let productoEnCarrito = carrito.find(producto => producto.id === id);
 
     if (productoEnCarrito) {
@@ -62,25 +57,23 @@ function agregarAlCarrito(id, nombre, precio) {
     actualizarCarrito();
 }
 
-
-
 function actualizarCarrito() {
     const tablaCarrito = document.getElementById('carrito-lista');
     tablaCarrito.innerHTML = '';
 
     carrito.forEach((producto, index) => {
         const fila = document.createElement('tr');
-       fila.innerHTML = `
-    <td>${producto.nombre}</td>
-    <td>$${producto.precio.toFixed(2)}</td>
-    <td>${producto.cantidad}</td>
-    <td>$${(producto.precio * producto.cantidad).toFixed(2)}</td>
-    <td>
-        <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
-        <button onclick="aumentarCantidad(${index})">+</button>
-        <button onclick="disminuirCantidad(${index})">-</button>
-    </td>
-`;
+        fila.innerHTML = `
+            <td>${producto.nombre}</td>
+            <td>$${producto.precio.toFixed(2)}</td>
+            <td>${producto.cantidad}</td>
+            <td>$${(producto.precio * producto.cantidad).toFixed(2)}</td>
+            <td>
+                <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
+                <button onclick="aumentarCantidad(${index})">+</button>
+                <button onclick="disminuirCantidad(${index})">-</button>
+            </td>
+        `;
 
         tablaCarrito.appendChild(fila);
     });
@@ -115,7 +108,7 @@ async function finalizarPedido() {
             body: JSON.stringify(pedido)
         });
 
-if (!response.ok) throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
 
         const data = await response.json();
 
@@ -124,14 +117,13 @@ if (!response.ok) throw new Error(`HTTP error! status: ${response.status} - ${re
             carrito = [];  // Vacía el carrito
             actualizarCarrito();
         } else {
-            alert(Error: ${data.message});
+            alert(`Error: ${data.message}`);
         }
     } catch (error) {
         console.error("Error al finalizar el pedido:", error);
-        alert(Error al finalizar el pedido: ${error.message});
+        alert(`Error al finalizar el pedido: ${error.message}`);
     }
 }
-
 
 function eliminarDelCarrito(index) {
     carrito.splice(index, 1);
@@ -152,8 +144,6 @@ function disminuirCantidad(index) {
     actualizarCarrito();
 }
 
-
-
 async function verPedido() {
     const id_cliente = localStorage.getItem('id_cliente');
 
@@ -163,7 +153,7 @@ async function verPedido() {
     }
 
     try {
-const response = await fetch(`/api/cliente/obtener-pedidos-cliente/${id_cliente}`);
+        const response = await fetch(`/api/cliente/obtener-pedidos-cliente/${id_cliente}`);
         const data = await response.json();
 
         if (data.success) {
@@ -178,7 +168,7 @@ const response = await fetch(`/api/cliente/obtener-pedidos-cliente/${id_cliente}
 
 function mostrarPedidosEnModal(pedidos) {
     const detallePedido = document.getElementById('detallePedido');
-    
+
     if (pedidos.length === 0) {
         detallePedido.innerHTML = "<p>No hay pedidos registrados.</p>";
     } else {
