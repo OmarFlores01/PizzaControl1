@@ -117,19 +117,24 @@ async function finalizarPedido() {
         const data = await response.json();
 
         if (data.success) {
-            alert("Pedido finalizado correctamente.");
-            carrito = [];  // Vacía el carrito
-            actualizarCarrito();
+    alert("Pedido finalizado correctamente.");
+    carrito = [];  // Vacía el carrito
+    actualizarCarrito();
 
-            // Mostrar modal de detalles de pago
-            mostrarModalPago(data.id_pedido, data.total);
-        } else {
-            alert(`Error: ${data.message}`);
-        }
-    } catch (error) {
-        console.error("Error al finalizar el pedido:", error);
-        alert(`Error al finalizar el pedido: ${error.message}`);
+    // Verificamos que `total` sea un número válido antes de mostrar el modal
+    const total = Number(data.total);
+    if (isNaN(total)) {
+        console.error("Total inválido recibido del servidor:", data.total);
+        alert("Error: Total del pedido no válido.");
+        return;
     }
+
+    // Mostrar modal de detalles de pago
+    mostrarModalPago(data.id_pedido, total);
+} else {
+    alert(`Error: ${data.message}`);
+}
+
 }
 
 function eliminarDelCarrito(index) {
@@ -176,10 +181,18 @@ async function verPedido() {
 
 // Función para mostrar el modal de pago con detalles del pedido
 function mostrarModalPago(id_pedido, total) {
+    // Verificamos si total es un número válido
+    if (isNaN(total)) {
+        console.error("Total inválido:", total);
+        alert("Error: El total del pedido no es válido.");
+        return;
+    }
+
     document.getElementById('modal-pedido-id').textContent = id_pedido;
-    document.getElementById('modal-total-pedido').textContent = total.toFixed(2);
+    document.getElementById('modal-total-pedido').textContent = total.toFixed(2);  // Aseguramos que total es un número válido
     document.getElementById('modalPago').style.display = 'block';
 }
+
 
 // Función para cerrar el modal de pago
 function cerrarModalPago() {
