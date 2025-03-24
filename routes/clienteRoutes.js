@@ -3,6 +3,7 @@ const router = express.Router();
 const db = require('../models/config/db'); // Verifica que esté bien configurado
 
 // Agregar un pedido
+// Agregar un pedido
 router.post('/agregar-pedido-cliente', (req, res) => {
     const { id_cliente, descripcion, total } = req.body;
 
@@ -10,9 +11,9 @@ router.post('/agregar-pedido-cliente', (req, res) => {
         return res.status(400).json({ success: false, message: 'Faltan datos del pedido' });
     }
 
-    const query = "SELECT ID_Pedido, Descripcion, Estado, Fecha, Total FROM pedidos WHERE ID_Cliente = ? ORDER BY Fecha DESC;";
+    const query = "INSERT INTO pedidos (ID_Cliente, Descripcion, Total, Estado, Fecha) VALUES (?, ?, ?, 'Pendiente', NOW());";
 
-    db.query(query, [id_cliente], (err, result) => { // Cambié los parámetros para que coincidan con la consulta
+    db.query(query, [id_cliente, descripcion, total], (err, result) => {
         if (err) {
             console.error('❌ Error al agregar el pedido:', err.message);
             return res.status(500).json({ success: false, message: 'Error al realizar el pedido' });
@@ -22,26 +23,21 @@ router.post('/agregar-pedido-cliente', (req, res) => {
     });
 });
 
-// Obtener pedidos por ID de Cliente
+// Ver pedidos de un cliente
 router.get('/obtener-pedidos-cliente/:id_cliente', (req, res) => {
-    const { id_cliente } = req.params;
+    const id_cliente = req.params.id_cliente;
 
-    const query = "SELECT ID_Pedido, Descripcion, Estado, Fecha, Total FROM pedidos WHERE ID_Cliente = ? ORDER BY Fecha DESC;";
+    const query = "SELECT ID_Pedido, Descripcion, Estado, Fecha, Total FROM pedidos WHERE ID_Cliente = ? ORDER BY Fecha DESC";
 
-    db.query(query, [id_cliente], (err, results) => {
+    db.query(query, [id_cliente], (err, result) => {
         if (err) {
-            console.error('❌ Error al obtener pedidos:', err.message);
+            console.error('❌ Error al obtener los pedidos:', err.message);
             return res.status(500).json({ success: false, message: 'Error al obtener los pedidos' });
         }
 
-        if (results.length === 0) {
-            return res.json({ success: false, message: 'No se encontraron pedidos para este cliente' });
-        }
-
-        res.json({ success: true, pedidos: results });
+        res.json({ success: true, pedidos: result });
     });
 });
-
 // Obtener productos
 router.get('/obtener-productos', (req, res) => {
     const query = "SELECT ID_Producto, Nombre, Precio FROM productos;";
