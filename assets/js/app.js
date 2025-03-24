@@ -79,6 +79,7 @@ function actualizarCarrito() {
     });
 }
 
+// Función que se llama cuando el pedido se finaliza
 async function finalizarPedido() {
     const id_cliente = localStorage.getItem('id_cliente');
 
@@ -116,6 +117,9 @@ async function finalizarPedido() {
             alert("Pedido finalizado correctamente.");
             carrito = [];  // Vacía el carrito
             actualizarCarrito();
+
+            // Mostrar modal de detalles de pago
+            mostrarModalPago(data.id_pedido, data.total);
         } else {
             alert(`Error: ${data.message}`);
         }
@@ -144,6 +148,7 @@ function disminuirCantidad(index) {
     actualizarCarrito();
 }
 
+// Función para ver los pedidos del cliente
 async function verPedido() {
     const id_cliente = localStorage.getItem('id_cliente');
 
@@ -162,34 +167,49 @@ async function verPedido() {
             alert("No se encontraron pedidos.");
         }
     } catch (error) {
-        console.error("❌ Error al obtener pedidos:", error);
+        console.error("Error al obtener los pedidos:", error);
     }
 }
 
+// Función para mostrar el modal de pago con detalles del pedido
+function mostrarModalPago(id_pedido, total) {
+    document.getElementById('modal-pedido-id').textContent = id_pedido;
+    document.getElementById('modal-total-pedido').textContent = total.toFixed(2);
+    document.getElementById('modalPago').style.display = 'block';
+}
+
+
+// Función para cerrar el modal de pago
+function cerrarModalPago() {
+    document.getElementById('modalPago').style.display = 'none';
+}
+
+// Función para mostrar los pedidos en el modal
 function mostrarPedidosEnModal(pedidos) {
-    const detallePedido = document.getElementById('detallePedido');
+    const listaPedidos = document.getElementById('lista-pedidos');
+    listaPedidos.innerHTML = ''; // Limpiar contenido previo
 
     if (pedidos.length === 0) {
-        detallePedido.innerHTML = "<p>No hay pedidos registrados.</p>";
+        listaPedidos.innerHTML = "<li>No tienes pedidos realizados.</li>";
     } else {
-        let contenido = "<ul>";
         pedidos.forEach(pedido => {
-            contenido += `<li>
+            const itemPedido = document.createElement('li');
+            itemPedido.innerHTML = `
                 <strong>ID:</strong> ${pedido.ID_Pedido} | 
                 <strong>Descripción:</strong> ${pedido.Descripcion} | 
-                <strong>Total:</strong> $${Number(pedido.Total).toFixed(2)} | 
+                <strong>Total:</strong> $${pedido.Total.toFixed(2)} | 
                 <strong>Estado:</strong> ${pedido.Estado} | 
                 <strong>Fecha:</strong> ${pedido.Fecha}
-            </li>`;
+            `;
+            listaPedidos.appendChild(itemPedido);
         });
-        contenido += "</ul>";
-        detallePedido.innerHTML = contenido;
     }
 
-    // Mostrar el modal
+    // Mostrar el modal de pedidos
     document.getElementById('modalPedido').style.display = 'block';
 }
 
+// Función para cerrar el modal de pedidos
 function cerrarModal() {
     document.getElementById('modalPedido').style.display = 'none';
 }
