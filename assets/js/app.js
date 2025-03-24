@@ -182,20 +182,22 @@ function mostrarPedidosEnModal(pedidos) {
     } else {
         let contenido = "<ul>";
         pedidos.forEach(pedido => {
-            contenido += <li>
+            contenido += `<li>
                 <strong>ID:</strong> ${pedido.ID_Pedido} | 
                 <strong>Descripción:</strong> ${pedido.Descripcion} | 
                 <strong>Total:</strong> $${Number(pedido.Total).toFixed(2)} | 
                 <strong>Estado:</strong> ${pedido.Estado} | 
                 <strong>Fecha:</strong> ${pedido.Fecha}
-            </li>;
+            </li>`;
         });
         contenido += "</ul>";
         detallePedido.innerHTML = contenido;
     }
 
+    // Mostrar el modal
     document.getElementById('modalPedido').style.display = 'block';
 }
+
 function cerrarModal() {
     document.getElementById('modalPedido').style.display = 'none';
 }
