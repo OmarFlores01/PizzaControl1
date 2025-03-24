@@ -58,8 +58,12 @@ router.post('/finalizar', (req, res) => {
         return res.status(400).json({ success: false, message: 'Faltan datos del pedido' });
     }
 
-    const descripcion = productos.map(p => `${p.cantidad}x ${p.nombre}`).join(', ');
-    const total = productos.reduce((sum, p) => sum + p.precio * p.cantidad, 0);
+    const descripcion = productos.map(p => `${p.cantidad}x ${p.nombre || 'Producto desconocido'}`).join(', ');
+    const total = productos.reduce((sum, p) => sum + (p.precio * p.cantidad || 0), 0);
+
+    if (isNaN(total) || total <= 0) {
+        return res.status(400).json({ success: false, message: 'Error en el cálculo del total del pedido.' });
+    }
 
     const query = "INSERT INTO pedidos (ID_Cliente, Descripcion, Estado, Fecha, Total, ID_Empleado) VALUES (?, ?, 'En preparación', NOW(), ?, NULL);";
 
