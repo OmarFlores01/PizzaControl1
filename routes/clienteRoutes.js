@@ -63,6 +63,5 @@ router.post('/finalizar', (req, res) => {
             id_pedido: result.insertId
         });
     });
-});
 
 module.exports = router;
