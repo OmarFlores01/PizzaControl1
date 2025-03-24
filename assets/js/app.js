@@ -1,25 +1,18 @@
 let carrito = [];
 
-document.addEventListener("DOMContentLoaded", function () {
-    // 🔹 Forzar ocultar los modales al inicio
+// Asegurar que los modales estén ocultos al cargar la página con CSS
+document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('modalPago').style.display = 'none';
     document.getElementById('modalPedido').style.display = 'none';
-
-    // 🔹 Verificar el estado del modal en la consola
-    console.log("Estado inicial del modalPago:", document.getElementById('modalPago').style.display);
-
-    // 🔹 Solución de último recurso para forzar la ocultación
-    setTimeout(() => {
-        document.getElementById('modalPago').style.display = 'none';
-    }, 100);
-
-    // 🔹 Cargar productos cuando la página se inicia
-    obtenerProductos();
+    obtenerProductos(); // Cargar productos al inicio
 });
 
+
+// Función para obtener productos
 async function obtenerProductos() {
     try {
         const response = await fetch('/api/productos/obtener-productos');
+        if (!response.ok) throw new Error("Error en la API");
         const data = await response.json();
 
         if (data.success) {
@@ -32,6 +25,7 @@ async function obtenerProductos() {
         console.error("Error al obtener productos:", error);
     }
 }
+
 
 function mostrarProductos(productos) {
     const tabla = document.getElementById('productos-lista');
@@ -150,6 +144,7 @@ async function finalizarPedido() {
     }
 }
 
+// Función para ver el pedido con validación
 async function verPedido() {
     const id_cliente = localStorage.getItem('id_cliente');
 
@@ -162,10 +157,11 @@ async function verPedido() {
         const response = await fetch(`/api/cliente/obtener-pedidos-cliente/${id_cliente}`);
         const data = await response.json();
 
-        console.log("📌 Datos obtenidos del pedido:", data); // ✅ Verifica la respuesta
+        console.log("📌 Datos obtenidos del pedido:", data);
 
         if (data.success && data.pedidos.length > 0) {
             mostrarPedidosEnModal(data.pedidos);
+            document.getElementById('modalPedido').style.display = 'block';
         } else {
             alert("No se encontraron pedidos.");
         }
@@ -175,27 +171,17 @@ async function verPedido() {
 }
 
 
+// Función para mostrar los pedidos en el modal
 function mostrarPedidosEnModal(pedidos) {
-    const detallePedido = document.getElementById('detallePedido');
+    const modalBody = document.getElementById('modalPedidoBody');
+    modalBody.innerHTML = "";
     
-    console.log("📌 Pedidos recibidos para el modal:", pedidos); // ✅ Verifica que hay datos
-
-    if (pedidos.length === 0) {
-        detallePedido.innerHTML = "<p>No hay pedidos registrados.</p>";
-    } else {
-        let contenido = "<ul>";
-        pedidos.forEach(pedido => {
-            contenido += `<li>
-                <strong>ID:</strong> ${pedido.ID_Pedido} <br>
-                <strong>Descripción:</strong> ${pedido.Descripcion} <br>
-                <strong>Total:</strong> $${Number(pedido.Total).toFixed(2)} <br>
-                <strong>Estado:</strong> ${pedido.Estado} <br>
-                <strong>Fecha:</strong> ${pedido.Fecha} <br><br>
-            </li>`;
-        });
-        contenido += "</ul>";
-        detallePedido.innerHTML = contenido;
-    }
+    pedidos.forEach(pedido => {
+        const pedidoElemento = document.createElement("div");
+        pedidoElemento.textContent = `Pedido: ${pedido.id} - Estado: ${pedido.estado}`;
+        modalBody.appendChild(pedidoElemento);
+    });
+}
 
     // ✅ Asegurar que el modal se muestra
     document.getElementById('modalPedido').style.display = 'block';
@@ -207,10 +193,10 @@ function mostrarPedidosEnModal(pedidos) {
     document.getElementById('modalPedido').style.display = 'block';
 }
 
-function cerrarModal() {
-    const modal = document.getElementById('modalPedido');
-    modal.style.display = 'none';
-    console.log("🚪 Modal cerrado");
+
+// Función para cerrar modales
+function cerrarModal(idModal) {
+    document.getElementById(idModal).style.display = 'none';
 }
 
 function verPedido() {
