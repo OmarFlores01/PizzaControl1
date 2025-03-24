@@ -163,7 +163,7 @@ async function verPedido() {
     }
 
     try {
-        const response = await fetch(/api/cliente/obtener-pedidos-cliente/${id_cliente});
+const response = await fetch(`/api/cliente/obtener-pedidos-cliente/${id_cliente}`);
         const data = await response.json();
 
         if (data.success) {
