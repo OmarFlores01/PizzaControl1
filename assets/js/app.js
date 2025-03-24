@@ -33,7 +33,7 @@ function mostrarProductos(productos) {
             <td>${producto.Nombre}</td>
             <td>$${precio.toFixed(2)}</td>
             <td>
-                <button onclick='agregarAlCarrito(${producto.ID_Producto}, "${producto.Nombre.replace(/"/g, '\\"')}", ${precio})'>Añadir</button>
+                <button onclick='agregarAlCarrito(${producto.ID_Producto}, "${encodeURIComponent(producto.Nombre)}", ${precio})'>Añadir</button>
             </td>
         `;
 
@@ -61,22 +61,25 @@ function actualizarCarrito() {
     const tablaCarrito = document.getElementById('carrito-lista');
     tablaCarrito.innerHTML = '';
 
-    carrito.forEach((producto, index) => {
-        const fila = document.createElement('tr');
-        fila.innerHTML = `
-            <td>${producto.nombre}</td>
-            <td>$${producto.precio.toFixed(2)}</td>
-            <td>${producto.cantidad}</td>
-            <td>$${(producto.precio * producto.cantidad).toFixed(2)}</td>
-            <td>
-                <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
-                <button onclick="aumentarCantidad(${index})">+</button>
-                <button onclick="disminuirCantidad(${index})">-</button>
-            </td>
-        `;
-
-        tablaCarrito.appendChild(fila);
-    });
+    if (carrito.length === 0) {
+        tablaCarrito.innerHTML = '<tr><td colspan="5">Tu carrito está vacío.</td></tr>';
+    } else {
+        carrito.forEach((producto, index) => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>${producto.nombre}</td>
+                <td>$${producto.precio.toFixed(2)}</td>
+                <td>${producto.cantidad}</td>
+                <td>$${(producto.precio * producto.cantidad).toFixed(2)}</td>
+                <td>
+                    <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
+                    <button onclick="aumentarCantidad(${index})">+</button>
+                    <button onclick="disminuirCantidad(${index})">-</button>
+                </td>
+            `;
+            tablaCarrito.appendChild(fila);
+        });
+    }
 }
 
 // Función que se llama cuando el pedido se finaliza
@@ -177,7 +180,6 @@ function mostrarModalPago(id_pedido, total) {
     document.getElementById('modal-total-pedido').textContent = total.toFixed(2);
     document.getElementById('modalPago').style.display = 'block';
 }
-
 
 // Función para cerrar el modal de pago
 function cerrarModalPago() {
