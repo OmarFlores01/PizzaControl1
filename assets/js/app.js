@@ -166,6 +166,8 @@ async function verPedido() {
         const response = await fetch(`/api/cliente/obtener-pedidos-cliente/${id_cliente}`);
         const data = await response.json();
 
+        console.log("📦 Respuesta de la API:", data); // Muestra el JSON recibido
+
         if (data.success) {
             mostrarPedidosEnModal(data.pedidos);
         } else {
@@ -176,6 +178,7 @@ async function verPedido() {
     }
 }
 
+
 // 💡 Función corregida para mostrar pedidos en el modal
 function mostrarPedidosEnModal(pedidos) {
     const listaPedidos = document.getElementById('lista-pedidos');
@@ -183,19 +186,29 @@ function mostrarPedidosEnModal(pedidos) {
 
     if (pedidos.length === 0) {
         listaPedidos.innerHTML = "<li>No tienes pedidos realizados.</li>";
-    } else {
-        pedidos.forEach(pedido => {
-            const itemPedido = document.createElement('li');
-            itemPedido.innerHTML = `
-                <strong>ID:</strong> ${pedido.ID_Pedido} | 
-                <strong>Descripción:</strong> ${pedido.Descripcion} | 
-                <strong>Total:</strong> $${pedido.Total.toFixed(2)} | 
-                <strong>Estado:</strong> ${pedido.Estado} | 
-                <strong>Fecha:</strong> ${pedido.Fecha}
-            `;
-            listaPedidos.appendChild(itemPedido);
-        });
+        return;
     }
+
+    pedidos.forEach(pedido => {
+        // Verificar si `Total` es un número, si no, convertirlo
+        let total = Number(pedido.Total); 
+
+        if (isNaN(total)) {
+            console.warn(`Pedido con ID ${pedido.ID_Pedido} tiene un Total inválido:`, pedido.Total);
+            total = 0; // Si no es un número, asignamos 0 para evitar errores
+        }
+
+        const itemPedido = document.createElement('li');
+        itemPedido.innerHTML = `
+            <strong>ID:</strong> ${pedido.ID_Pedido} | 
+            <strong>Descripción:</strong> ${pedido.Descripcion} | 
+            <strong>Total:</strong> $${total.toFixed(2)} | 
+            <strong>Estado:</strong> ${pedido.Estado} | 
+            <strong>Fecha:</strong> ${pedido.Fecha}
+        `;
+
+        listaPedidos.appendChild(itemPedido);
+    });
 
     document.getElementById('modalPedido').style.display = 'block';
 }
