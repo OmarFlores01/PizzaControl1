@@ -41,25 +41,27 @@ function eliminarDelCarrito(id) {
 
 // Finalizar Pedido
 async function finalizarPedido() {
-    const id_cliente = localStorage.getItem('id_cliente'); // Obtener ID del cliente
+    const id_cliente = localStorage.getItem('id_cliente'); 
 
     if (!id_cliente || carrito.length === 0) {
         alert("⚠️ No hay cliente registrado o el carrito está vacío.");
         return;
     }
 
+    console.log("📌 Enviando pedido:", { id_cliente, productos: carrito }); // DEPURACIÓN
+
     try {
         const response = await fetch('/api/pedido/finalizar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_cliente, productos: carrito })
+            body: JSON.stringify({ id_cliente, productos: carrito }) // Enviamos productos correctamente
         });
 
         const data = await response.json();
         
         if (data.success) {
             alert("✅ Pedido realizado con éxito");
-            localStorage.removeItem('carrito'); // Vaciar carrito
+            localStorage.removeItem('carrito'); 
             carrito = [];
             actualizarCarrito();
         } else {
