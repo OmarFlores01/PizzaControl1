@@ -24,7 +24,7 @@ function mostrarProductos(productos) {
         const precio = Number(producto.Precio);
 
         if (isNaN(precio)) {
-            console.error(❌ Precio inválido para ${producto.Nombre}:, producto.Precio);
+console.error(`❌ Precio inválido para ${producto.Nombre}: ${producto.Precio}`);
             return;
         }
 
