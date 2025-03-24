@@ -8,6 +8,15 @@
     <link rel="stylesheet" href="/assets/logout.css">
 </head>
 <body>
+    <div class="container">
+    <button id="btnDescargarMenu">Imprimir Menú</button>
+</div>
+
+<script>
+    document.getElementById('btnDescargarMenu').addEventListener('click', function() {
+        window.location.href = '/descargar-menu';
+    });
+</script>
     <a href="/views/login.html" class="logout">Cerrar sesión</a>
 
     <div class="container">
