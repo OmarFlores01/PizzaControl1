@@ -70,17 +70,18 @@ function actualizarCarrito() {
 
     carrito.forEach((producto, index) => {
         const fila = document.createElement('tr');
-        fila.innerHTML = 
-            <td>${producto.nombre}</td>
-            <td>$${producto.precio.toFixed(2)}</td>
-            <td>${producto.cantidad}</td>
-            <td>$${(producto.precio * producto.cantidad).toFixed(2)}</td>
-            <td>
-                <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
-                <button onclick="aumentarCantidad(${index})">+</button>
-                <button onclick="disminuirCantidad(${index})">-</button>
-            </td>
-        ;
+       fila.innerHTML = `
+    <td>${producto.nombre}</td>
+    <td>$${producto.precio.toFixed(2)}</td>
+    <td>${producto.cantidad}</td>
+    <td>$${(producto.precio * producto.cantidad).toFixed(2)}</td>
+    <td>
+        <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
+        <button onclick="aumentarCantidad(${index})">+</button>
+        <button onclick="disminuirCantidad(${index})">-</button>
+    </td>
+`;
+
         tablaCarrito.appendChild(fila);
     });
 }
