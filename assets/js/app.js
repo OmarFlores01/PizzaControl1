@@ -142,6 +142,26 @@ async function finalizarPedido() {
     }
 }
 
+function aumentarCantidad(index) {
+    if (index >= 0 && index < carrito.length) {
+        carrito[index].cantidad += 1;
+        actualizarCarrito();
+    }
+}
+
+function disminuirCantidad(index) {
+    if (index >= 0 && index < carrito.length) {
+        if (carrito[index].cantidad > 1) {
+            carrito[index].cantidad -= 1;
+        } else {
+            // Si la cantidad llega a 0, eliminar el producto del carrito
+            carrito.splice(index, 1);
+        }
+        actualizarCarrito();
+    }
+}
+
+
 // 💡 Función corregida para mostrar el modal de pago
 function mostrarModalPago(id_pedido, total) {
     document.getElementById('modal-pedido-id').textContent = id_pedido;
