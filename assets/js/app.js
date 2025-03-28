@@ -75,7 +75,6 @@ function actualizarCarrito() {
                 <td>${producto.cantidad}</td>
                 <td>$${totalProducto.toFixed(2)}</td>
                 <td>
-                    <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
                     <button onclick="aumentarCantidad(${index})">+</button>
                     <button onclick="disminuirCantidad(${index})">-</button>
                 </td>
