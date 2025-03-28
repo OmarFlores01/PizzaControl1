@@ -23,21 +23,46 @@ router.post('/agregar-pedido-cliente', (req, res) => {
     });
 });
 
-// Ver pedidos de un cliente
-router.get('/obtener-pedidos-cliente/:id_cliente', (req, res) => {
-    const id_cliente = req.params.id_cliente;
+// Obtener todos los pedidos con información del cliente
+router.get('/obtener-pedidos', (req, res) => {
+    const query = `
+        SELECT p.ID_Pedido, c.Nombre AS Cliente, p.Total, p.Estado
+        FROM pedidos p
+        LEFT JOIN clientes c ON p.ID_Cliente = c.ID_Cliente
+        ORDER BY p.Fecha DESC;
+    `;
 
-    const query = "SELECT ID_Pedido, Descripcion, Estado, Fecha, Total FROM pedidos WHERE ID_Cliente = ? ORDER BY Fecha DESC";
-
-    db.query(query, [id_cliente], (err, result) => {
+    db.query(query, (err, result) => {
         if (err) {
             console.error('❌ Error al obtener los pedidos:', err.message);
-            return res.status(500).json({ success: false, message: 'Error al obtener los pedidos' });
+            return res.status(500).json({ success: false, message: 'Error al obtener pedidos' });
         }
 
         res.json({ success: true, pedidos: result });
     });
 });
+
+// Obtener pedidos de un cliente específico
+router.get('/obtener-pedidos-cliente/:id_cliente', (req, res) => {
+    const id_cliente = req.params.id_cliente;
+
+    const query = `
+        SELECT ID_Pedido, Descripcion, Estado, Fecha, Total 
+        FROM pedidos 
+        WHERE ID_Cliente = ? 
+        ORDER BY Fecha DESC;
+    `;
+
+    db.query(query, [id_cliente], (err, result) => {
+        if (err) {
+            console.error('❌ Error al obtener los pedidos del cliente:', err.message);
+            return res.status(500).json({ success: false, message: 'Error al obtener pedidos del cliente' });
+        }
+
+        res.json({ success: true, pedidos: result });
+    });
+});
+
 // Obtener productos
 router.get('/obtener-productos', (req, res) => {
     const query = "SELECT ID_Producto, Nombre, Precio FROM productos;";
