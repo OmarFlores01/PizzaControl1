@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos</title>
+</head>
+<body>
+    <h1>Lista de Pedidos</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID Pedido</th>
+                <th>Cliente</th>
+                <th>Total</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-pedidos">
+            <!-- Aquí se llenarán los pedidos dinámicamente -->
+        </tbody>
+    </table>
+
+    <script>
+        async function obtenerPedidos() {
+            try {
+                const response = await fetch('/api/cliente/obtener-pedidos'); // Nueva ruta sin ID específico
+                const data = await response.json();
+
+                if (!data.success) {
+                    console.error("❌ No se encontraron pedidos.");
+                    return;
+                }
+
+                const tabla = document.getElementById('tabla-pedidos');
+                tabla.innerHTML = '';
+
+                data.pedidos.forEach(pedido => {
+                    const total = isNaN(pedido.Total) ? 0 : Number(pedido.Total).toFixed(2);
+
+                    const fila = document.createElement('tr');
+                    fila.innerHTML = `
+                        <td>${pedido.ID_Pedido}</td>
+                        <td>${pedido.Cliente || "Desconocido"}</td>
+                        <td>$${total}</td>
+                        <td>${pedido.Estado}</td>
+                    `;
+                    tabla.appendChild(fila);
+                });
+            } catch (error) {
+                console.error("❌ Error al obtener pedidos:", error);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', obtenerPedidos);
+    </script>
+</body>
+</html>
