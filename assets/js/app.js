@@ -130,8 +130,12 @@ async function finalizarPedido() {
 
         if (data.success) {
             alert("Pedido finalizado correctamente.");
+            
+            // Vaciar carrito
             carrito = [];
             actualizarCarrito();
+
+            // Mostrar el modal con los datos del pedido
             mostrarModalPago(data.id_pedido, total);
         } else {
             alert(`Error: ${data.message}`);
@@ -141,6 +145,21 @@ async function finalizarPedido() {
         alert(`Error al finalizar el pedido: ${error.message}`);
     }
 }
+
+// ✅ Esta función ahora muestra el ID en el modal de pago correctamente
+function mostrarModalPago(idPedido, total) {
+    document.getElementById("modal-pedido-id").textContent = idPedido;
+    document.getElementById("modal-total-pedido").textContent = total.toFixed(2);
+    document.getElementById("modal-concepto").textContent = `Pedido-${idPedido}`;
+
+    // Mostrar el modal
+    document.getElementById("modalPago").style.display = "block";
+}
+
+function cerrarModalPago() {
+    document.getElementById("modalPago").style.display = "none";
+}
+
 
 function aumentarCantidad(index) {
     if (index >= 0 && index < carrito.length) {
@@ -162,13 +181,6 @@ function disminuirCantidad(index) {
 }
 
 
-// 💡 Función corregida para mostrar el modal de pago
-function mostrarModalPago(id_pedido, total) {
-    document.getElementById('modal-pedido-id').textContent = id_pedido;
-    document.getElementById('modal-total-pedido').textContent = total.toFixed(2);
-    document.getElementById('modalPago').style.display = 'block';
-}
-
 function cerrarModalPago() {
     document.getElementById('modalPago').style.display = 'none';
 }
@@ -182,21 +194,10 @@ async function verPedido() {
         return;
     }
 
-    try {
-        const response = await fetch(`/api/cliente/obtener-pedidos-cliente/${id_cliente}`);
-        const data = await response.json();
-
-        console.log("📦 Respuesta de la API:", data); // Muestra el JSON recibido
-
-        if (data.success) {
-            mostrarPedidosEnModal(data.pedidos);
-        } else {
-            alert("No se encontraron pedidos.");
-        }
-    } catch (error) {
-        console.error("Error al obtener los pedidos:", error);
-    }
+    // Redirigir a pedidos.html con el ID del cliente en la URL
+    window.location.href = `/views/pedidos.html?id_cliente=${id_cliente}`;
 }
+
 
 
 // 💡 Función corregida para mostrar pedidos en el modal
