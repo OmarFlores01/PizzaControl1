@@ -22,37 +22,48 @@
     </table>
 
     <script>
-        async function obtenerPedidos() {
-            try {
-                const response = await fetch('/api/cliente/obtener-pedidos'); // Nueva ruta sin ID específico
-                const data = await response.json();
+        document.addEventListener("DOMContentLoaded", async function() {
+    const params = new URLSearchParams(window.location.search);
+    const id_cliente = params.get("id_cliente");
 
-                if (!data.success) {
-                    console.error("❌ No se encontraron pedidos.");
-                    return;
-                }
+    if (!id_cliente) {
+        alert("Error: No se encontró el cliente.");
+        return;
+    }
 
-                const tabla = document.getElementById('tabla-pedidos');
-                tabla.innerHTML = '';
+    try {
+        const response = await fetch(`/api/cliente/obtener-pedidos-cliente/${id_cliente}`);
+        const data = await response.json();
 
-                data.pedidos.forEach(pedido => {
-                    const total = isNaN(pedido.Total) ? 0 : Number(pedido.Total).toFixed(2);
+        console.log("📦 Pedidos recibidos:", data); // Muestra en consola los pedidos
 
-                    const fila = document.createElement('tr');
-                    fila.innerHTML = `
-                        <td>${pedido.ID_Pedido}</td>
-                        <td>${pedido.Cliente || "Desconocido"}</td>
-                        <td>$${total}</td>
-                        <td>${pedido.Estado}</td>
-                    `;
-                    tabla.appendChild(fila);
-                });
-            } catch (error) {
-                console.error("❌ Error al obtener pedidos:", error);
-            }
+        if (data.success) {
+            mostrarPedidosEnPantalla(data.pedidos);
+        } else {
+            alert("No se encontraron pedidos.");
         }
+    } catch (error) {
+        console.error("Error al obtener los pedidos:", error);
+    }
+});
 
-        window.addEventListener('DOMContentLoaded', obtenerPedidos);
+function mostrarPedidosEnPantalla(pedidos) {
+    const pedidosContainer = document.getElementById("pedidos-container"); // Asegúrate de tener un contenedor en pedidos.html
+
+    if (!pedidos.length) {
+        pedidosContainer.innerHTML = "<p>No hay pedidos disponibles.</p>";
+        return;
+    }
+
+    pedidosContainer.innerHTML = pedidos.map(pedido => `
+        <div class="pedido">
+            <p><strong>ID Pedido:</strong> ${pedido.id}</p>
+            <p><strong>Total:</strong> $${pedido.total}</p>
+            <p><strong>Estado:</strong> ${pedido.estado}</p>
+        </div>
+    `).join('');
+}
+
     </script>
 </body>
 </html>
