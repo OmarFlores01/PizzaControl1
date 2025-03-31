@@ -1,36 +1,80 @@
-document.getElementById('pedidoForm').addEventListener('submit', function(event) {
-    event.preventDefault();
+let pedidos = [];
 
-    const descripcion = document.getElementById('descripcion').value.trim();
-    const total = parseFloat(document.getElementById('total').value);
-    const id_empleado = localStorage.getItem('id_empleado'); 
-
-    if (!id_empleado) {
-        alert('Error: No hay un empleado identificado.');
-        return;
+async function obtenerPedidos() {
+    try {
+        const response = await fetch('/api/pedidos/obtener-pedidos');
+        const data = await response.json();
+        if (data.success) {
+            mostrarPedidos(data.pedidos);
+        } else {
+            console.error("No se recibieron pedidos.");
+        }
+    } catch (error) {
+        console.error("Error al obtener pedidos:", error);
     }
+}
 
-    if (!descripcion || isNaN(total) || total <= 0) {
-        alert('Error: Descripción o total inválido');
-        return;
-    }
+function mostrarPedidos(pedidos) {
+    const tabla = document.getElementById('pedidos-lista');
+    tabla.innerHTML = '';
 
-    fetch('/api/pedidos/agregar-pedido', {
-        method: 'POST',
+    pedidos.forEach(pedido => {
+        const total = Number(pedido.Total) || 0;
+        const descripcionDecodificada = decodeURIComponent(pedido.Descripcion);
+
+        if (!descripcionDecodificada) {
+            console.error(`❌ Pedido inválido: ${pedido.ID_Pedido} - Descripción: ${pedido.Descripcion}`);
+            return;
+        }
+
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${pedido.ID_Pedido}</td>
+            <td>${descripcionDecodificada}</td>
+            <td>$${total.toFixed(2)}</td>
+            <td>${pedido.Estado}</td>
+            <td>
+                <button onclick='actualizarEstadoPedido(${pedido.ID_Pedido}, "Completado")'>Completar</button>
+                <button onclick='eliminarPedido(${pedido.ID_Pedido})'>Eliminar</button>
+            </td>
+        `;
+
+        tabla.appendChild(fila);
+    });
+}
+
+window.addEventListener('DOMContentLoaded', obtenerPedidos);
+
+function actualizarEstadoPedido(idPedido, nuevoEstado) {
+    fetch(`/api/pedidos/actualizar-estado/${idPedido}`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ descripcion, total, id_empleado })
+        body: JSON.stringify({ estado: nuevoEstado })
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Pedido agregado correctamente');
-            window.location.href = '/views/empleado.html';
+            alert("Estado actualizado correctamente");
+            obtenerPedidos();
         } else {
-            alert('Error al agregar el pedido: ' + data.message);
+            alert("Error al actualizar estado: " + data.message);
         }
     })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Hubo un error al agregar el pedido.');
-    });
-});
+    .catch(error => console.error("Error:", error));
+}
+
+function eliminarPedido(idPedido) {
+    fetch(`/api/pedidos/eliminar/${idPedido}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Pedido eliminado correctamente");
+            obtenerPedidos();
+        } else {
+            alert("Error al eliminar el pedido: " + data.message);
+        }
+    })
+    .catch(error => console.error("Error:", error));
+}
