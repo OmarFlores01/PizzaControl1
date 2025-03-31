@@ -14,13 +14,54 @@
         <h1>Agregar Inventario</h1>
         <form id="inventarioForm">
             <input type="text" id="nombre_producto" name="nombre_producto" placeholder="Nombre del Producto" required>
-            <input type="number" id="cantidad" name="cantidad" placeholder="Cantidad" required>
+            <input type="number" id="cantidad" name="cantidad" placeholder="Cantidad" required min="1">
             <button type="submit">Agregar Inventario</button>
         </form>
     </div>
 
     <button class="back-btn" onclick="window.location.href='empleado.html'">Atrás</button>
     
-    <script src="/assets/script/inventario/agregar_inventario.js"></script>
+    <script>
+        document.getElementById("inventarioForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Evita la recarga de la página
+
+            // Obtener valores del formulario
+            const nombre_producto = document.getElementById("nombre_producto").value;
+            const cantidad = parseInt(document.getElementById("cantidad").value, 10);
+            const id_empleado = localStorage.getItem("id_empleado"); // Obtener ID del empleado desde localStorage
+
+            // Validar que todos los campos estén llenos
+            if (!nombre_producto || isNaN(cantidad) || !id_empleado) {
+                alert("Todos los campos son obligatorios.");
+                return;
+            }
+
+            // Validar que la cantidad no sea negativa o cero
+            if (cantidad <= 0) {
+                alert("La cantidad debe ser un número positivo.");
+                return;
+            }
+
+            // Enviar datos al servidor con Fetch
+            fetch('/api/inventario/agregar-inventario', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ Nombre: nombre_producto, Cantidad: cantidad, ID_Empleado: id_empleado })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Inventario agregado correctamente."); // Mostrar ventana emergente
+                    document.getElementById("inventarioForm").reset(); // Limpiar formulario
+                } else {
+                    alert("Error al agregar inventario.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Ocurrió un error al conectar con el servidor.");
+            });
+        });
+    </script>
 </body>
 </html>
