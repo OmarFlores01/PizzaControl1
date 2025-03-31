@@ -74,7 +74,6 @@ router.delete('/eliminar', (req, res) => {
 });
 
 // Finalizar un pedido
-// Finalizar un pedido
 router.post('/finalizar', (req, res) => {
     const { id_cliente, productos } = req.body;
 
@@ -105,7 +104,5 @@ router.post('/finalizar', (req, res) => {
         });
     });
 });
-
-
 
 module.exports = router;
