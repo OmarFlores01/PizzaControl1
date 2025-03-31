@@ -62,10 +62,14 @@ function agregarAlCarrito(id, nombre, precio) {
 
 function actualizarCarrito() {
     const tablaCarrito = document.getElementById('carrito-lista');
+    const btnFinalizar = document.getElementById('btn-finalizar'); // 🚀 Agregamos referencia al botón
     tablaCarrito.innerHTML = '';
+
+    let carritoValido = true; // ✅ Variable para verificar si hay errores
 
     if (carrito.length === 0) {
         tablaCarrito.innerHTML = '<tr><td colspan="5">Tu carrito está vacío.</td></tr>';
+        btnFinalizar.disabled = true; // 🛑 Si está vacío, no permitir finalizar
     } else {
         carrito.forEach((producto, index) => {
             const totalProducto = producto.precio * producto.cantidad;
@@ -81,22 +85,31 @@ function actualizarCarrito() {
                     <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
                 </td>
             `;
+
+            if (producto.cantidad < 1 || isNaN(producto.cantidad)) {
+                carritoValido = false; // 🚨 Detectamos cantidades inválidas
+            }
+
             tablaCarrito.appendChild(fila);
         });
+
+        btnFinalizar.disabled = !carritoValido; // ✅ Solo habilitamos si todas las cantidades son válidas
     }
 }
+
 
 function cambiarCantidad(index, nuevaCantidad) {
     nuevaCantidad = parseInt(nuevaCantidad);
-
-    if (!Number.isInteger(nuevaCantidad) || nuevaCantidad < 1) {
+    if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
         alert("Cantidad inválida. Debe ser un número positivo.");
-        nuevaCantidad = 1;
+        carrito[index].cantidad = 1; // Se corrige a 1
+    } else {
+        carrito[index].cantidad = nuevaCantidad;
     }
 
-    carrito[index].cantidad = nuevaCantidad;
-    actualizarCarrito();
+    actualizarCarrito(); // ✅ Volvemos a validar si el botón debe deshabilitarse
 }
+
 
 
 
