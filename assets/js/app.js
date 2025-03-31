@@ -115,19 +115,17 @@ async function finalizarPedido() {
         return;
     }
 
-    // Validar que ningún producto tenga cantidad menor a 1
-    for (let item of carrito) {
-        if (item.cantidad < 1) {
-            alert(`Error: La cantidad del producto "${item.nombre}" no puede ser menor a 1.`);
-            return;
-        }
+    // ✅ Validar que no haya productos con cantidad menor a 1
+    const productoInvalido = carrito.find(item => item.cantidad < 1);
+    if (productoInvalido) {
+        alert(`Error: La cantidad del producto "${productoInvalido.nombre}" no puede ser menor a 1.`);
+        return;
     }
 
-    // Aplicar `Math.max(1, cantidad)` para asegurarse de que siempre sea al menos 1
     const productosValidos = carrito.map(item => ({
         id: item.id,
         nombre: item.nombre,
-        cantidad: Math.max(1, item.cantidad),
+        cantidad: item.cantidad, // Se mantiene tal cual, sin forzar valores
         precio: item.precio
     }));
 
@@ -164,6 +162,7 @@ async function finalizarPedido() {
         alert(`Error al finalizar el pedido: ${error.message}`);
     }
 }
+
 
 // ✅ Esta función ahora muestra el ID en el modal de pago correctamente
 function mostrarModalPago(idPedido, total) {
