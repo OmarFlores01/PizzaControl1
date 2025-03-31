@@ -133,11 +133,11 @@ async function finalizarPedido() {
         return;
     }
 
-    // ✅ Volver a validar cantidades antes de enviar el pedido
+    // ✅ Validar cantidades antes de enviar el pedido
     for (let item of carrito) {
         if (!Number.isInteger(item.cantidad) || item.cantidad < 1) {
             alert(`Error: La cantidad del producto "${item.nombre}" es inválida.`);
-            return;  // 🚨 Se detiene el pedido
+            return;  // 🚨 ¡Esto detendrá la ejecución!
         }
     }
 
@@ -181,6 +181,7 @@ async function finalizarPedido() {
         alert(`Error al finalizar el pedido: ${error.message}`);
     }
 }
+
 
 
 
