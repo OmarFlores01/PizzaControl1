@@ -3,29 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar Pedido - Empleado</title>
+    <title>Interfaz de Empleado</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
     <link rel="stylesheet" href="/assets/logout.css">
-    <link rel="stylesheet" href="/assets/css/styles3.css">
 </head>
 <body>
+    <div class="container">
+        <button id="btnDescargarMenu">Descargar Menú</button>
+    </div>
+
+    <script>
+        document.getElementById('btnDescargarMenu').addEventListener('click', function() {
+            window.location.href = '/descargar-menu';
+        });
+    </script>
+    
     <a href="/views/login.html" class="logout">Cerrar sesión</a>
 
     <div class="container">
-        <h1>Agregar Pedido</h1>
-        <form id="pedidoForm">
-            <label for="descripcion">Descripción del Pedido</label>
-            <input type="text" id="descripcion" placeholder="Ej: Pizza grande de peperoni" required>
-
-            <label for="total">Total ($)</label>
-            <input type="number" id="total" placeholder="Total a pagar" required>
-
-            <button type="submit">Agregar Pedido</button>
-        </form>
+        <h1>Pedidos en Curso</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Pedido</th>
+                    <th>Descripción</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="pedidos-lista">
+                <!-- Pedidos dinámicos -->
+            </tbody>
+        </table>
     </div>
 
-    <script src="/assets/script/pedido/agregar_pedido.js"></script>
-
-    <!-- Botón atrás FUERA del contenedor y al fondo de la página -->
-    <button onclick="window.location.href='/views/empleado.html'" class="btn-atras">Atrás</button>
+    <script src="../assets/js/empleado.js"></script>
 </body>
 </html>
