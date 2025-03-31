@@ -52,10 +52,13 @@ function agregarAlCarrito(id, nombre, precio) {
 
     if (!productoEnCarrito) {
         carrito.push({ id, nombre, precio, cantidad: 1 });
+    } else {
+        productoEnCarrito.cantidad += 1; // ✅ Aumenta la cantidad si el producto ya está en el carrito
     }
 
     actualizarCarrito();
 }
+
 
 function actualizarCarrito() {
     const tablaCarrito = document.getElementById('carrito-lista');
@@ -85,14 +88,16 @@ function actualizarCarrito() {
 
 function cambiarCantidad(index, nuevaCantidad) {
     nuevaCantidad = parseInt(nuevaCantidad);
-    if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
+
+    if (!Number.isInteger(nuevaCantidad) || nuevaCantidad < 1) {
         alert("Cantidad inválida. Debe ser un número positivo.");
-        carrito[index].cantidad = 1; // Evita valores negativos
-    } else {
-        carrito[index].cantidad = nuevaCantidad;
+        nuevaCantidad = 1;
     }
+
+    carrito[index].cantidad = nuevaCantidad;
     actualizarCarrito();
 }
+
 
 
 function eliminarDelCarrito(index) {
@@ -105,7 +110,7 @@ function eliminarDelCarrito(index) {
 async function finalizarPedido() {
     const id_cliente = localStorage.getItem('id_cliente');
 
-    if (!id_cliente) {
+    if (!id_cliente || isNaN(Number(id_cliente))) {  // ✅ Verifica que el ID sea un número válido
         alert("Error: No hay cliente registrado.");
         return;
     }
@@ -115,7 +120,6 @@ async function finalizarPedido() {
         return;
     }
 
-    // ✅ Validar que no haya productos con cantidad menor a 1
     const productoInvalido = carrito.find(item => item.cantidad < 1);
     if (productoInvalido) {
         alert(`Error: La cantidad del producto "${productoInvalido.nombre}" no puede ser menor a 1.`);
@@ -125,7 +129,7 @@ async function finalizarPedido() {
     const productosValidos = carrito.map(item => ({
         id: item.id,
         nombre: item.nombre,
-        cantidad: item.cantidad, // Se mantiene tal cual, sin forzar valores
+        cantidad: item.cantidad,
         precio: item.precio
     }));
 
@@ -136,7 +140,7 @@ async function finalizarPedido() {
         return;
     }
 
-    const pedido = { id_cliente, productos: productosValidos };
+    const pedido = { id_cliente: Number(id_cliente), productos: productosValidos };
 
     try {
         const response = await fetch('/api/pedidos/finalizar', {
@@ -162,6 +166,7 @@ async function finalizarPedido() {
         alert(`Error al finalizar el pedido: ${error.message}`);
     }
 }
+
 
 
 // ✅ Esta función ahora muestra el ID en el modal de pago correctamente
@@ -229,13 +234,7 @@ function mostrarPedidosEnModal(pedidos) {
     }
 
     pedidos.forEach(pedido => {
-        // Verificar si `Total` es un número, si no, convertirlo
-        let total = Number(pedido.Total); 
-
-        if (isNaN(total)) {
-            console.warn(`Pedido con ID ${pedido.ID_Pedido} tiene un Total inválido:`, pedido.Total);
-            total = 0; // Si no es un número, asignamos 0 para evitar errores
-        }
+        let total = Number(pedido.Total) || 0; // ✅ Si `pedido.Total` es `null`, asigna `0`
 
         const itemPedido = document.createElement('li');
         itemPedido.innerHTML = `
@@ -251,6 +250,7 @@ function mostrarPedidosEnModal(pedidos) {
 
     document.getElementById('modalPedido').style.display = 'block';
 }
+
 
 // 💡 Función para cerrar modal de pedidos
 function cerrarModal() {
