@@ -110,7 +110,7 @@ function eliminarDelCarrito(index) {
 async function finalizarPedido() {
     const id_cliente = localStorage.getItem('id_cliente');
 
-    if (!id_cliente || isNaN(Number(id_cliente))) {  // ✅ Verifica que el ID sea un número válido
+    if (!id_cliente || isNaN(Number(id_cliente))) {
         alert("Error: No hay cliente registrado.");
         return;
     }
@@ -120,10 +120,12 @@ async function finalizarPedido() {
         return;
     }
 
-    const productoInvalido = carrito.find(item => item.cantidad < 1);
-    if (productoInvalido) {
-        alert(`Error: La cantidad del producto "${productoInvalido.nombre}" no puede ser menor a 1.`);
-        return;
+    // ✅ Volver a validar cantidades antes de enviar el pedido
+    for (let item of carrito) {
+        if (!Number.isInteger(item.cantidad) || item.cantidad < 1) {
+            alert(`Error: La cantidad del producto "${item.nombre}" es inválida.`);
+            return;  // 🚨 Se detiene el pedido
+        }
     }
 
     const productosValidos = carrito.map(item => ({
@@ -166,6 +168,7 @@ async function finalizarPedido() {
         alert(`Error al finalizar el pedido: ${error.message}`);
     }
 }
+
 
 
 
