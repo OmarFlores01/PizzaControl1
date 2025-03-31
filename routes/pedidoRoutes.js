@@ -105,4 +105,39 @@ router.post('/finalizar', (req, res) => {
     });
 });
 
+// Obtener todos los productos
+router.get('/obtener-productos', async (req, res) => {
+    try {
+        const productos = await db.query('SELECT * FROM Producto');
+        res.json({ success: true, productos });
+    } catch (error) {
+        console.error("Error al obtener productos:", error);
+        res.status(500).json({ success: false, message: "Error interno del servidor" });
+    }
+});
+
+// Finalizar pedido
+router.post('/finalizar', async (req, res) => {
+    const { id_cliente, productos } = req.body;
+    if (!id_cliente || !Array.isArray(productos) || productos.length === 0) {
+        return res.status(400).json({ success: false, message: "Datos de pedido inválidos" });
+    }
+
+    try {
+        const result = await db.query('INSERT INTO Pedido (ID_Cliente) VALUES (?)', [id_cliente]);
+        const id_pedido = result.insertId;
+
+        for (const producto of productos) {
+            await db.query('INSERT INTO DetallePedido (ID_Pedido, ID_Producto, Cantidad) VALUES (?, ?, ?)', 
+                [id_pedido, producto.id, producto.cantidad]);
+        }
+
+        res.json({ success: true, message: "Pedido finalizado correctamente" });
+    } catch (error) {
+        console.error("Error al finalizar el pedido:", error);
+        res.status(500).json({ success: false, message: "Error interno del servidor" });
+    }
+});
+
+
 module.exports = router;
