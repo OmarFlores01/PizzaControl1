@@ -87,10 +87,10 @@ function cambiarCantidad(index, nuevaCantidad) {
     nuevaCantidad = parseInt(nuevaCantidad);
     if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
         alert("Cantidad inválida. Debe ser un número positivo.");
-        actualizarCarrito(); // Restablecer la vista con la cantidad previa
-        return;
+        carrito[index].cantidad = 1; // Evita valores negativos
+    } else {
+        carrito[index].cantidad = nuevaCantidad;
     }
-    carrito[index].cantidad = nuevaCantidad;
     actualizarCarrito();
 }
 
@@ -123,10 +123,11 @@ async function finalizarPedido() {
         }
     }
 
+    // Aplicar `Math.max(1, cantidad)` para asegurarse de que siempre sea al menos 1
     const productosValidos = carrito.map(item => ({
         id: item.id,
         nombre: item.nombre,
-        cantidad: item.cantidad,
+        cantidad: Math.max(1, item.cantidad),
         precio: item.precio
     }));
 
@@ -137,13 +138,10 @@ async function finalizarPedido() {
         return;
     }
 
-    const pedido = {
-        id_cliente: id_cliente,
-        productos: productosValidos
-    };
+    const pedido = { id_cliente, productos: productosValidos };
 
     try {
-        const response = await fetch('/api/pedidos/finalizar', { 
+        const response = await fetch('/api/pedidos/finalizar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(pedido)
@@ -155,12 +153,8 @@ async function finalizarPedido() {
 
         if (data.success) {
             alert("Pedido finalizado correctamente.");
-            
-            // Vaciar carrito
             carrito = [];
             actualizarCarrito();
-
-            // Mostrar el modal con los datos del pedido
             mostrarModalPago(data.id_pedido, total);
         } else {
             alert(`Error: ${data.message}`);
