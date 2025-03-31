@@ -86,7 +86,9 @@ function actualizarCarrito() {
 function cambiarCantidad(index, nuevaCantidad) {
     nuevaCantidad = parseInt(nuevaCantidad);
     if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
-        nuevaCantidad = 1;
+        alert("Cantidad inválida. Debe ser un número positivo.");
+        actualizarCarrito();
+        return;
     }
     carrito[index].cantidad = nuevaCantidad;
     actualizarCarrito();
@@ -96,6 +98,7 @@ function eliminarDelCarrito(index) {
     carrito.splice(index, 1);
     actualizarCarrito();
 }
+
 
 
 async function finalizarPedido() {
