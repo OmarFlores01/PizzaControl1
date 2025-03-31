@@ -62,14 +62,14 @@ function agregarAlCarrito(id, nombre, precio) {
 
 function actualizarCarrito() {
     const tablaCarrito = document.getElementById('carrito-lista');
-    const btnFinalizar = document.getElementById('btn-finalizar'); // 🚀 Agregamos referencia al botón
+    const btnFinalizar = document.getElementById('btn-finalizar');
     tablaCarrito.innerHTML = '';
 
-    let carritoValido = true; // ✅ Variable para verificar si hay errores
+    let carritoValido = true; 
 
     if (carrito.length === 0) {
         tablaCarrito.innerHTML = '<tr><td colspan="5">Tu carrito está vacío.</td></tr>';
-        btnFinalizar.disabled = true; // 🛑 Si está vacío, no permitir finalizar
+        btnFinalizar.disabled = true; 
     } else {
         carrito.forEach((producto, index) => {
             const totalProducto = producto.precio * producto.cantidad;
@@ -87,28 +87,30 @@ function actualizarCarrito() {
             `;
 
             if (producto.cantidad < 1 || isNaN(producto.cantidad)) {
-                carritoValido = false; // 🚨 Detectamos cantidades inválidas
+                carritoValido = false; 
             }
 
             tablaCarrito.appendChild(fila);
         });
 
-        btnFinalizar.disabled = !carritoValido; // ✅ Solo habilitamos si todas las cantidades son válidas
+        btnFinalizar.disabled = !carritoValido; 
     }
 }
 
 
 function cambiarCantidad(index, nuevaCantidad) {
     nuevaCantidad = parseInt(nuevaCantidad);
+    
     if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
-        alert("Cantidad inválida. Debe ser un número positivo.");
-        carrito[index].cantidad = 1; // Se corrige a 1
-    } else {
-        carrito[index].cantidad = nuevaCantidad;
+        alert("La cantidad debe ser un número válido y mayor a 0.");
+        actualizarCarrito(); // Esto evita que se quede con el número inválido
+        return;
     }
 
-    actualizarCarrito(); // ✅ Volvemos a validar si el botón debe deshabilitarse
+    carrito[index].cantidad = nuevaCantidad;
+    actualizarCarrito();
 }
+
 
 
 
@@ -120,67 +122,41 @@ function eliminarDelCarrito(index) {
 
 
 
-async function finalizarPedido() {
-    const id_cliente = localStorage.getItem('id_cliente');
-
-    if (!id_cliente || isNaN(Number(id_cliente))) {
-        alert("Error: No hay cliente registrado.");
-        return;
-    }
-
+function finalizarPedido() {
     if (carrito.length === 0) {
-        alert("El carrito está vacío.");
+        alert("Tu carrito está vacío.");
         return;
     }
 
-    // ✅ Validar cantidades antes de enviar el pedido
-    for (let item of carrito) {
-        if (!Number.isInteger(item.cantidad) || item.cantidad < 1) {
-            alert(`Error: La cantidad del producto "${item.nombre}" es inválida.`);
-            return;  // 🚨 ¡Esto detendrá la ejecución!
-        }
-    }
-
-    const productosValidos = carrito.map(item => ({
-        id: item.id,
-        nombre: item.nombre,
-        cantidad: item.cantidad,
-        precio: item.precio
-    }));
-
-    const total = productosValidos.reduce((sum, p) => sum + (p.precio * p.cantidad), 0);
-
-    if (isNaN(total) || total <= 0) {
-        alert("Error: El total del pedido no es válido.");
-        return;
-    }
-
-    const pedido = { id_cliente: Number(id_cliente), productos: productosValidos };
-
-    try {
-        const response = await fetch('/api/pedidos/finalizar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(pedido)
-        });
-
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
-
-        const data = await response.json();
-
-        if (data.success) {
-            alert("Pedido finalizado correctamente.");
-            carrito = [];
+    for (const producto of carrito) {
+        if (producto.cantidad < 1 || isNaN(producto.cantidad)) {
+            alert("Error: La cantidad de los productos debe ser mayor a 0.");
             actualizarCarrito();
-            mostrarModalPago(data.id_pedido, total);
-        } else {
-            alert(`Error: ${data.message}`);
+            return;
         }
-    } catch (error) {
-        console.error("Error al finalizar el pedido:", error);
-        alert(`Error al finalizar el pedido: ${error.message}`);
     }
+
+    fetch('/finalizar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            id_cliente: 1, 
+            productos: carrito 
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Pedido finalizado con éxito.");
+            carrito = []; 
+            actualizarCarrito();
+        } else {
+            alert("Error al finalizar el pedido: " + data.message);
+        }
+    })
+    .catch(error => console.error("Error:", error));
 }
+
 
 
 
