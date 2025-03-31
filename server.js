@@ -7,7 +7,7 @@ require('dotenv').config();  // Cargar las variables de entorno desde el archivo
 const app = express();
 const PORT = 3000;
 
-// Sirve archivos estáticos sean accesibles
+// Configuración de middleware
 app.use(cors());
 app.use(express.json());
 app.use('/assets', express.static(path.join(__dirname, 'assets')));
@@ -18,13 +18,14 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views/login.html'));
 });
 
-// Rutas para interactuar con el servidor
+// Rutas de la API
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/pedidos', require('./routes/pedidoRoutes'));
 app.use('/api/productos', require('./routes/productoRoutes'));
 app.use('/api/inventario', require('./routes/inventarioRoutes'));
 app.use('/api/cliente', require('./routes/clienteRoutes'));
 
+// Descarga del menú
 app.get('/descargar-menu', (req, res) => {
     const menuPath = path.join(__dirname, 'assets/Menu/Menu.pdf');
     res.download(menuPath, 'Menu.pdf', (err) => {
@@ -35,12 +36,11 @@ app.get('/descargar-menu', (req, res) => {
     });
 });
 
-
 // Inicia el servidor
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
 
-    // Ejemplo de uso de la base de datos, solo para probar si está funcionando
+    // Prueba de conexión a la base de datos
     db.query('SELECT 1', (err, result) => {
         if (err) {
             console.error('❌ Error en la consulta:', err);
