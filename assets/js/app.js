@@ -50,9 +50,7 @@ function agregarAlCarrito(id, nombre, precio) {
 
     let productoEnCarrito = carrito.find(producto => producto.id === id);
 
-    if (productoEnCarrito) {
-        productoEnCarrito.cantidad += 1;
-    } else {
+    if (!productoEnCarrito) {
         carrito.push({ id, nombre, precio, cantidad: 1 });
     }
 
@@ -72,17 +70,33 @@ function actualizarCarrito() {
             fila.innerHTML = `
                 <td>${producto.nombre}</td>
                 <td>$${producto.precio.toFixed(2)}</td>
-                <td>${producto.cantidad}</td>
+                <td>
+                    <input type="number" value="${producto.cantidad}" min="1" onchange="cambiarCantidad(${index}, this.value)">
+                </td>
                 <td>$${totalProducto.toFixed(2)}</td>
                 <td>
-                    <button onclick="aumentarCantidad(${index})">+</button>
-                    <button onclick="disminuirCantidad(${index})">-</button>
+                    <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
                 </td>
             `;
             tablaCarrito.appendChild(fila);
         });
     }
 }
+
+function cambiarCantidad(index, nuevaCantidad) {
+    nuevaCantidad = parseInt(nuevaCantidad);
+    if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
+        nuevaCantidad = 1;
+    }
+    carrito[index].cantidad = nuevaCantidad;
+    actualizarCarrito();
+}
+
+function eliminarDelCarrito(index) {
+    carrito.splice(index, 1);
+    actualizarCarrito();
+}
+
 
 async function finalizarPedido() {
     const id_cliente = localStorage.getItem('id_cliente');
