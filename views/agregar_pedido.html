@@ -5,22 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregar Pedido - Empleado</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
-    <link rel="stylesheet" href="/assets/logout.css"></head>
+    <link rel="stylesheet" href="/assets/logout.css">
+</head>
 <body>
     <h1>Agregar Pedido</h1>
     
     <div class="productos-container">
         <h2>Productos Disponibles</h2>
-        <ul id="lista-productos">
-            <!-- Aquí se generarán los productos dinámicamente -->
-        </ul>
+        <table id="productos-lista">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aquí se generarán los productos dinámicamente -->
+            </tbody>
+        </table>
     </div>
     
     <div class="carrito-container">
         <h2>Carrito de Pedidos</h2>
-        <ul id="lista-carrito">
-            <!-- Aquí se generarán los pedidos seleccionados dinámicamente -->
-        </ul>
+        <table id="carrito-lista">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Total</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aquí se generarán los pedidos seleccionados dinámicamente -->
+            </tbody>
+        </table>
         <button id="confirmar-pedido">Confirmar Pedido</button>
     </div>
 
