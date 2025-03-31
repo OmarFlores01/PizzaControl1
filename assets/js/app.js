@@ -115,6 +115,14 @@ async function finalizarPedido() {
         return;
     }
 
+    // Validar que ningún producto tenga cantidad menor a 1
+    for (let item of carrito) {
+        if (item.cantidad < 1) {
+            alert(`Error: La cantidad del producto "${item.nombre}" no puede ser menor a 1.`);
+            return;
+        }
+    }
+
     const productosValidos = carrito.map(item => ({
         id: item.id,
         nombre: item.nombre,
