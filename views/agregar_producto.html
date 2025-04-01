@@ -45,74 +45,63 @@
     
 <script>
     document.getElementById("categoria").addEventListener("change", function() {
-    actualizarNombreProducto();
-});
-
-document.getElementById("tamanio").addEventListener("change", function() {
-    actualizarNombreProducto();
-    
-    const precioSpan = document.getElementById("precio");
-    const tamanio = this.value;
-    
-    let precio;
-    switch (tamanio) {
-        case "CHICA": precio = 170; break;
-        case "MEDIANA": precio = 190; break;
-        case "12 REBANADAS": precio = 210; break;
-        case "FAMILIAR": precio = 230; break;
-        case "GRANDE": precio = 250; break;
-        case "EXTRAFAMILIAR": precio = 250; break;
-        default: precio = null; break;
-    }
-    
-    precioSpan.textContent = precio ? `$${precio}` : "";
-});
-
-function actualizarNombreProducto() {
-    const nombreInput = document.getElementById("nombre_producto");
-    const categoria = document.getElementById("categoria").value.trim();
-    const tamanio = document.getElementById("tamanio").value.trim();
-    
-    let nombreBase = nombreInput.value.replace(/(Pepperoni|Hawaiana|Mexicana|Tres Quesos|Carnes Frias)?( CHICA| MEDIANA| 12 REBANADAS| FAMILIAR| GRANDE| EXTRAFAMILIAR)?$/, '').trim();
-    
-    if (categoria) {
-        nombreBase += ` ${categoria}`;
-    }
-    if (tamanio) {
-        nombreBase += ` ${tamanio}`;
-    }
-    
-    nombreInput.value = nombreBase.trim();
-}
-
-document.getElementById("form-agregar-producto").addEventListener("submit", function(event) {
-    event.preventDefault();
-    const nombre = document.getElementById("nombre_producto").value.trim();
-    const precio = document.getElementById("precio").textContent.replace('$', '');
-    
-    if (!nombre || !precio) {
-        alert("Por favor ingrese un nombre válido y seleccione un tamaño.");
-        return;
-    }
-
-    fetch("/api/productos/agregar-producto", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre_producto: nombre, precio: parseFloat(precio) })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("✅ Producto agregado correctamente.");
-            document.getElementById("form-agregar-producto").reset();
-            document.getElementById("precio").textContent = "";
+        const nombreInput = document.getElementById("nombre_producto");
+        const categoria = this.value.trim();
+        let nombreSinCategoria = nombreInput.value.replace(/^(Pepperoni|Hawaiana|Mexicana|Tres Quesos|Carnes Frias) /, '').trim();
+        
+        if (categoria) {
+            nombreInput.value = ${nombreSinCategoria} ${categoria}.trim();
         } else {
-            alert("❌ Error: " + (data.message || "No se pudo agregar el producto."));
+            nombreInput.value = nombreSinCategoria;
         }
-    })
-    .catch(error => alert("❌ Error de conexión con el servidor."));
-});
+    });
 
+    document.getElementById("tamanio").addEventListener("change", function() {
+        const precioSpan = document.getElementById("precio");
+        const tamanio = this.value;
+        
+        let precio;
+        switch (tamanio) {
+            case "CHICA": precio = 170; break;
+            case "MEDIANA": precio = 190; break;
+            case "12 REBANADAS": precio = 210; break;
+            case "FAMILIAR": precio = 230; break;
+            case "GRANDE": precio = 250; break;
+            case "EXTRAFAMILIAR": precio = 250; break;
+            default: precio = null; break;
+        }
+        
+        precioSpan.textContent = precio ? $${precio} : "";
+    });
+
+    document.getElementById("form-agregar-producto").addEventListener("submit", function(event) {
+        event.preventDefault();
+        const nombre = document.getElementById("nombre_producto").value.trim();
+        const tamanio = document.getElementById("tamanio").value;
+        const precio = document.getElementById("precio").textContent.replace('$', '');
+        
+        if (!nombre || !precio) {
+            alert("Por favor ingrese un nombre válido y seleccione un tamaño.");
+            return;
+        }
+
+        fetch("/api/productos/agregar-producto", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nombre_producto: nombre, precio: parseFloat(precio) })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("✅ Producto agregado correctamente.");
+                document.getElementById("form-agregar-producto").reset();
+                document.getElementById("precio").textContent = "";
+            } else {
+                alert("❌ Error: " + (data.message || "No se pudo agregar el producto."));
+            }
+        })
+        .catch(error => alert("❌ Error de conexión con el servidor."));
+    });
 </script>
     
     <button onclick="window.location.href='/views/empleado.html'" class="btn-atras">Atrás</button>
