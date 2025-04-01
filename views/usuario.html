@@ -9,14 +9,14 @@
 </head>
 <body>
     <div class="container">
-    <button id="btnDescargarMenu">Descargar Menú</button>
-</div>
+        <button id="btnDescargarMenu">Descargar Menú</button>
+    </div>
 
-<script>
-    document.getElementById('btnDescargarMenu').addEventListener('click', function() {
-        window.location.href = '/descargar-menu';
-    });
-</script>
+    <script>
+        document.getElementById('btnDescargarMenu').addEventListener('click', function() {
+            window.location.href = '/descargar-menu';
+        });
+    </script>
     <a href="/views/login.html" class="logout">Cerrar sesión</a>
 
     <div class="container">
@@ -25,7 +25,6 @@
             <thead>
                 <tr>
                     <th>Nombre</th>
-                    <th>Precio</th>
                     <th>Acción</th>
                 </tr>
             </thead>
@@ -41,6 +40,7 @@
             <thead>
                 <tr>
                     <th>Nombre</th>
+                    <th>Tamaño</th>
                     <th>Precio</th>
                     <th>Cantidad</th>
                     <th>Total</th>
@@ -55,18 +55,117 @@
         <button onclick="verPedido()">Ver Pedido</button>
     </div>
 
-   <!-- MODAL PARA MOSTRAR DATOS DE TRANSFERENCIA -->
-<div id="modalPago" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="cerrarModalPago()">&times;</span>
-        <h2>Detalles de Pago</h2>
-        <p><strong>ID del Pedido:</strong> <span id="modal-pedido-id"></span></p>
-        <p><strong>Cuenta de Transferencia:</strong> 12345676543</p>
-        <p><strong>Total:</strong> $<span id="modal-total-pedido"></span></p>
-        <p><strong>Envia Captura de la Transferencia al número:</strong> 5565544395</p>
-        <p><strong>Concepto:</strong> <span id="modal-concepto"></span></p>
-    </div>
-</div>
     <script src="../assets/js/app.js"></script>
+    <script>
+        let carrito = [];
+
+        async function obtenerProductos() {
+            try {
+                const response = await fetch('/api/productos/obtener-productos');
+                const data = await response.json();
+                if (data.success) {
+                    mostrarProductos(data.productos);
+                } else {
+                    console.error("No se recibieron productos.");
+                }
+            } catch (error) {
+                console.error("Error al obtener productos:", error);
+            }
+        }
+
+        function mostrarProductos(productos) {
+            const tabla = document.getElementById('productos-lista');
+            tabla.innerHTML = '';
+
+            productos.forEach(producto => {
+                const nombreDecodificado = decodeURIComponent(producto.Nombre);
+
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${nombreDecodificado}</td>
+                    <td>
+                        <button onclick='agregarAlCarrito("${nombreDecodificado}")'>Añadir</button>
+                    </td>
+                `;
+                tabla.appendChild(fila);
+            });
+        }
+
+        function agregarAlCarrito(nombre) {
+            const tamanio = prompt("Seleccione el tamaño: \nCHICA - $170\nMEDIANA - $190\n12 REBANADAS - $210\nFAMILIAR - $230\nGRANDE - $250\nEXTRAFAMILIAR - $250");
+            
+            const precios = {
+                "CHICA": 170,
+                "MEDIANA": 190,
+                "12 REBANADAS": 210,
+                "FAMILIAR": 230,
+                "GRANDE": 250,
+                "EXTRAFAMILIAR": 250
+            };
+
+            if (!precios[tamanio]) {
+                alert("Tamaño no válido.");
+                return;
+            }
+
+            let productoEnCarrito = carrito.find(producto => producto.nombre === nombre && producto.tamanio === tamanio);
+
+            if (!productoEnCarrito) {
+                carrito.push({ nombre, tamanio, precio: precios[tamanio], cantidad: 1 });
+            } else {
+                productoEnCarrito.cantidad += 1;
+            }
+
+            actualizarCarrito();
+        }
+
+        function actualizarCarrito() {
+            const tablaCarrito = document.getElementById('carrito-lista');
+            const btnFinalizar = document.getElementById('btn-finalizar');
+            tablaCarrito.innerHTML = '';
+
+            if (carrito.length === 0) {
+                tablaCarrito.innerHTML = '<tr><td colspan="6">Tu carrito está vacío.</td></tr>';
+                btnFinalizar.disabled = true;
+            } else {
+                carrito.forEach((producto, index) => {
+                    const totalProducto = producto.precio * producto.cantidad;
+                    const fila = document.createElement('tr');
+                    fila.innerHTML = `
+                        <td>${producto.nombre}</td>
+                        <td>${producto.tamanio}</td>
+                        <td>$${producto.precio.toFixed(2)}</td>
+                        <td>
+                            <input type="number" value="${producto.cantidad}" min="1" onchange="cambiarCantidad(${index}, this.value)">
+                        </td>
+                        <td>$${totalProducto.toFixed(2)}</td>
+                        <td>
+                            <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
+                        </td>
+                    `;
+                    tablaCarrito.appendChild(fila);
+                });
+                btnFinalizar.disabled = false;
+            }
+        }
+
+        function cambiarCantidad(index, nuevaCantidad) {
+            nuevaCantidad = parseInt(nuevaCantidad);
+            if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
+                alert("Cantidad inválida.");
+                actualizarCarrito();
+                return;
+            }
+            carrito[index].cantidad = nuevaCantidad;
+            actualizarCarrito();
+        }
+
+        function eliminarDelCarrito(index) {
+            carrito.splice(index, 1);
+            actualizarCarrito();
+        }
+
+        window.addEventListener('DOMContentLoaded', obtenerProductos);
+    </script>
 </body>
 </html>
