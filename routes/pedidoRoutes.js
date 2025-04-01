@@ -106,15 +106,16 @@ router.post('/finalizar', (req, res) => {
 });
 
 // Obtener todos los productos
-router.get('/obtener-productos', async (req, res) => {
-    try {
-        const productos = await db.query('SELECT * FROM Producto');
-        res.json({ success: true, productos });
-    } catch (error) {
-        console.error("Error al obtener productos:", error);
-        res.status(500).json({ success: false, message: "Error interno del servidor" });
-    }
+router.get('/obtener-productos', (req, res) => {
+    db.query('SELECT * FROM Producto', (err, result) => {
+        if (err) {
+            console.error("Error al obtener productos:", err);
+            return res.status(500).json({ success: false, message: "Error interno del servidor" });
+        }
+        res.json({ success: true, productos: result });
+    });
 });
+
 
 // Finalizar pedido
 router.post('/finalizar', async (req, res) => {
