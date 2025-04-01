@@ -73,23 +73,24 @@
             }
         }
 
-        function mostrarProductos(productos) {
-            const tabla = document.getElementById('productos-lista');
-            tabla.innerHTML = '';
+function mostrarProductos(productos) {
+    const tabla = document.getElementById('productos-lista');
+    tabla.innerHTML = '';
 
-            productos.forEach(producto => {
-                const nombreDecodificado = decodeURIComponent(producto.Nombre);
+    productos.forEach(producto => {
+        const nombreDecodificado = decodeURIComponent(producto.Nombre);
 
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td>${nombreDecodificado}</td>
-                    <td>
-                        <button onclick='agregarAlCarrito("${nombreDecodificado}")'>Añadir</button>
-                    </td>
-                `;
-                tabla.appendChild(fila);
-            });
-        }
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${nombreDecodificado}</td>
+            <td>
+                <button onclick='agregarAlCarrito("${nombreDecodificado}")'>Añadir</button>
+            </td>
+        `;
+        tabla.appendChild(fila);
+    });
+}
+
 
         function agregarAlCarrito(nombre) {
             const tamanio = prompt("Seleccione el tamaño: \nCHICA - $170\nMEDIANA - $190\n12 REBANADAS - $210\nFAMILIAR - $230\nGRANDE - $250\nEXTRAFAMILIAR - $250");
