@@ -3,13 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interfaz de Empleados</title>
+    <title>Agregar Pedido - Empleado</title>
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="/assets/logout.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Productos Disponibles</h1>
-        <table>
+    <a href="/views/login.html" class="logout">Cerrar sesión</a>
+    <h1>Agregar Pedido</h1>
+    
+    <div class="productos-container">
+        <h2>Productos Disponibles</h2>
+        <table id="productos-lista">
             <thead>
                 <tr>
                     <th>Nombre</th>
@@ -17,15 +21,15 @@
                     <th>Acción</th>
                 </tr>
             </thead>
-            <tbody id="productos-lista">
-                <!-- Productos dinámicos -->
+            <tbody>
+                <!-- Aquí se generarán los productos dinámicamente -->
             </tbody>
         </table>
     </div>
-
-    <div class="container cart-container">
-        <h1>Carrito de Compras</h1>
-        <table>
+    
+    <div class="carrito-container">
+        <h2>Carrito de Pedidos</h2>
+        <table id="carrito-lista">
             <thead>
                 <tr>
                     <th>Nombre</th>
@@ -35,58 +39,60 @@
                     <th>Acción</th>
                 </tr>
             </thead>
-            <tbody id="carrito-lista">
-                <!-- Productos en el carrito -->
+            <tbody>
+                <!-- Aquí se generarán los pedidos seleccionados dinámicamente -->
             </tbody>
         </table>
-        <button id="btn-finalizar" onclick="finalizarPedido()" disabled>Finalizar Pedido</button>
+        <button id="confirmar-pedido" disabled>Confirmar Pedido</button>
     </div>
+    <button onclick="window.location.href='/views/empleado.html'" class="btn-atras">Atrás</button>
 
     <script>
         let carrito = [];
 
         async function obtenerProductos() {
-    try {
-        const response = await fetch('/api/productos/obtener-productos');
-        const data = await response.json();
-        if (data.success) {
-            mostrarProductos(data.productos);
-        } else {
-            console.error("No se recibieron productos.");
+            try {
+                const response = await fetch('/api/productos/obtener-productos');
+                const data = await response.json();
+                if (data.success) {
+                    mostrarProductos(data.productos);
+                } else {
+                    console.error("No se recibieron productos.");
+                }
+            } catch (error) {
+                console.error("Error al obtener productos:", error);
+            }
         }
-    } catch (error) {
-        console.error("Error al obtener productos:", error);
-    }
-}
 
         function mostrarProductos(productos) {
-    const tabla = document.getElementById('productos-lista');
-    tabla.innerHTML = '';
+            const tabla = document.querySelector('#productos-lista tbody');
+            tabla.innerHTML = '';
+            
+            productos.forEach(producto => {
+                const precio = Number(producto.Precio);
+                const nombreDecodificado = decodeURIComponent(producto.Nombre);
 
-    productos.forEach(producto => {
-        const precio = Number(producto.Precio);
-        const nombreDecodificado = decodeURIComponent(producto.Nombre);
+                if (isNaN(precio) || !nombreDecodificado) {
+                    console.error(❌ Producto inválido: ${producto.Nombre} - Precio: ${producto.Precio});
+                    return;
+                }
 
-        if (isNaN(precio) || !nombreDecodificado) {
-            console.error(`❌ Producto inválido: ${producto.Nombre} - Precio: ${producto.Precio}`);
-            return;
+                const fila = document.createElement('tr');
+                fila.innerHTML = 
+                    <td>${nombreDecodificado}</td>
+                    <td>$${precio.toFixed(2)}</td>
+                    <td><button onclick='agregarAlCarrito(${producto.ID_Producto}, "${nombreDecodificado}", ${precio})'>Añadir</button></td>
+                ;
+                tabla.appendChild(fila);
+            });
         }
 
-        const fila = document.createElement('tr');
-        fila.innerHTML = `
-            <td>${nombreDecodificado}</td>
-            <td>$${precio.toFixed(2)}</td>
-            <td>
-                <button onclick='agregarAlCarrito(${producto.ID_Producto}, "${nombreDecodificado}", ${precio})'>Añadir</button>
-            </td>
-        `;
-
-        tabla.appendChild(fila);
-    });
-}
         function agregarAlCarrito(id, nombre, precio) {
+            if (!nombre || isNaN(precio)) {
+                console.error("❌ No se puede agregar un producto inválido.");
+                return;
+            }
             let productoEnCarrito = carrito.find(producto => producto.id === id);
-
             if (!productoEnCarrito) {
                 carrito.push({ id, nombre, precio, cantidad: 1 });
             } else {
@@ -96,8 +102,8 @@
         }
 
         function actualizarCarrito() {
-            const tablaCarrito = document.getElementById('carrito-lista');
-            const btnFinalizar = document.getElementById('btn-finalizar');
+            const tablaCarrito = document.querySelector('#carrito-lista tbody');
+            const btnFinalizar = document.getElementById('confirmar-pedido');
             tablaCarrito.innerHTML = '';
 
             if (carrito.length === 0) {
@@ -109,19 +115,16 @@
             carrito.forEach((producto, index) => {
                 const totalProducto = producto.precio * producto.cantidad;
                 const fila = document.createElement('tr');
-                fila.innerHTML = `
+                fila.innerHTML = 
                     <td>${producto.nombre}</td>
                     <td>$${producto.precio.toFixed(2)}</td>
-                    <td>
-                        <input type="number" value="${producto.cantidad}" min="1" onchange="cambiarCantidad(${index}, this.value)">
-                    </td>
+                    <td><input type="number" value="${producto.cantidad}" min="1" onchange="cambiarCantidad(${index}, this.value)"></td>
                     <td>$${totalProducto.toFixed(2)}</td>
-                    <td>
-                        <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
-                    </td>
-                `;
+                    <td><button onclick="eliminarDelCarrito(${index})">Eliminar</button></td>
+                ;
                 tablaCarrito.appendChild(fila);
             });
+
             btnFinalizar.disabled = false;
         }
 
@@ -141,32 +144,25 @@
             actualizarCarrito();
         }
 
-        async function finalizarPedido() {
+        document.getElementById('confirmar-pedido').addEventListener('click', async function() {
             if (carrito.length === 0) {
                 alert("Tu carrito está vacío.");
                 return;
             }
-
-            try {
-                const response = await fetch('/finalizar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ productos: carrito })
-                });
-
-                const data = await response.json();
-                if (data.success) {
-                    alert("Pedido finalizado con éxito.");
-                    carrito = [];
-                    actualizarCarrito();
-                } else {
-                    alert("Error al finalizar el pedido: " + (data.message || "Desconocido"));
-                }
-            } catch (error) {
-                console.error("Error en finalizarPedido:", error);
-                alert("Hubo un problema al conectar con el servidor.");
+            const response = await fetch('/finalizar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_cliente: 1, productos: carrito })
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert("Pedido finalizado con éxito.");
+                carrito = [];
+                actualizarCarrito();
+            } else {
+                alert("Error al finalizar el pedido: " + data.message);
             }
-        }
+        });
 
         window.addEventListener('DOMContentLoaded', obtenerProductos);
     </script>
