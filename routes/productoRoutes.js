@@ -6,13 +6,14 @@ const db = require('../models/config/db'); // Asegúrate de importar la conexió
 
 // Agregar producto
 router.post('/agregar-producto', (req, res) => {
-    const { nombre_producto, precio } = req.body;
+    const { nombre_producto, tamanio, precio } = req.body;
 
-    if (!nombre_producto || precio <= 0) {
+    if (!nombre_producto || !tamanio || isNaN(precio) || precio <= 0) {
         return res.status(400).json({ success: false, message: "Datos inválidos" });
     }
 
-    db.query('INSERT INTO producto (Nombre, Precio) VALUES (?, ?)', [nombre_producto, precio], (err, result) => {
+    const query = 'INSERT INTO producto (Nombre, Tamanio, Precio) VALUES (?, ?, ?)';
+    db.query(query, [nombre_producto, tamanio, precio], (err, result) => {
         if (err) {
             console.error("Error al agregar producto:", err);
             return res.status(500).json({ success: false, message: "Error al agregar producto" });
@@ -20,6 +21,7 @@ router.post('/agregar-producto', (req, res) => {
         res.json({ success: true, message: "Producto agregado correctamente" });
     });
 });
+
 
 
 // Obtener todos los productos
