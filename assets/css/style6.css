@@ -60,6 +60,23 @@ button:hover {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+.back-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #c0392b;
+}
 .btn-atras {
     display: block;
     width: 150px;
