@@ -101,21 +101,22 @@
         }
 
         function mostrarProductos(productos) {
-            const tabla = document.getElementById('productos-lista');
-            tabla.innerHTML = '';
+    const tabla = document.getElementById('productos-lista');
+    tabla.innerHTML = ''; // Limpiar la tabla antes de agregar nuevos productos
 
-            productos.forEach(producto => {
-                const nombreDecodificado = decodeURIComponent(producto.Nombre);
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td>${nombreDecodificado}</td>
-                    <td>
-                        <button onclick='mostrarModalSeleccionTamanio("${nombreDecodificado}")'>Añadir</button>
-                    </td>
-                `;
-                tabla.appendChild(fila);
-            });
-        }
+    productos.forEach(producto => {
+        const nombreDecodificado = decodeURIComponent(producto.Nombre);
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${nombreDecodificado}</td>
+            <td>
+                <button onclick='mostrarModalSeleccionTamanio("${nombreDecodificado}")'>Añadir</button>
+            </td>
+        `;
+        tabla.appendChild(fila);
+    });
+}
+
 
         function mostrarModalSeleccionTamanio(nombre) {
             productoSeleccionado = nombre;
