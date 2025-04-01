@@ -47,7 +47,7 @@ button:hover {
     background-color: #c0392b;
 }
 
-.back-btn {
+.back-button {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -61,7 +61,7 @@ button:hover {
     transition: background-color 0.3s ease;
 }
 
-.back-btn:hover {
+.back-button:hover {
     background-color: #c0392b;
 }
 .btn-atras {
