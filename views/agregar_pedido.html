@@ -65,27 +65,33 @@
         }
 
         function mostrarProductos(productos) {
-            const tabla = document.querySelector('#productos-lista tbody');
-            tabla.innerHTML = '';
-            
-            productos.forEach(producto => {
-                const precio = Number(producto.Precio);
-                const nombre = decodeURIComponent(producto.Nombre);
+    const tabla = document.querySelector('#productos-lista tbody');
+    tabla.innerHTML = '';
 
-                if (isNaN(precio) || !nombre) {
-                    console.error(`Producto inválido: ${producto.Nombre} - Precio: ${producto.Precio}`);
-                    return;
-                }
+    if (!Array.isArray(productos) || productos.length === 0) {
+        console.error("No hay productos disponibles.");
+        return;
+    }
 
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td>${nombre}</td>
-                    <td>$${precio.toFixed(2)}</td>
-                    <td><button onclick='agregarAlCarrito(${producto.ID_Producto}, "${nombre}", ${precio})'>Añadir</button></td>
-                `;
-                tabla.appendChild(fila);
-            });
+    productos.forEach(producto => {
+        if (!producto.Nombre || isNaN(producto.Precio)) {
+            console.error(`Producto inválido: ${JSON.stringify(producto)}`);
+            return;
         }
+
+        const nombre = decodeURIComponent(producto.Nombre);
+        const precio = Number(producto.Precio);
+
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${nombre}</td>
+            <td>$${precio.toFixed(2)}</td>
+            <td><button onclick='agregarAlCarrito(${producto.ID_Producto}, "${nombre}", ${precio})'>Añadir</button></td>
+        `;
+        tabla.appendChild(fila);
+    });
+}
+
 
         function agregarAlCarrito(id, nombre, precio) {
             let productoEnCarrito = carrito.find(producto => producto.id === id);
