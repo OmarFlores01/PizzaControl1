@@ -29,35 +29,46 @@
         </form>
     </div>
 
-    <script>
-        document.getElementById("form-agregar-producto").addEventListener("submit", function(event) {
-            event.preventDefault();
-            const nombre = document.getElementById("nombre_producto").value.trim();
-            const precio = parseFloat(document.getElementById("precio").value);
-            const categoria = document.getElementById("categoria").value.trim() || null;
+    
+            <script>
+    document.getElementById("categoria").addEventListener("change", function() {
+        const nombreInput = document.getElementById("nombre_producto");
+        const categoria = this.value.trim();
+        
+        if (categoria) {
+            nombreInput.value = `${categoria} ${nombreInput.value.replace(/^(Pepperoni|Hawaiana|Mexicana|Tres Quesos|Carnes Frias) /, '')}`.trim();
+        } else {
+            nombreInput.value = nombreInput.value.replace(/^(Pepperoni|Hawaiana|Mexicana|Tres Quesos|Carnes Frias) /, '').trim();
+        }
+    });
 
-            if (!nombre || precio <= 0) {
-                alert("Por favor ingrese un nombre válido y un precio mayor a 0.");
-                return;
+    document.getElementById("form-agregar-producto").addEventListener("submit", function(event) {
+        event.preventDefault();
+        const nombre = document.getElementById("nombre_producto").value.trim();
+        const precio = parseFloat(document.getElementById("precio").value);
+
+        if (!nombre || precio <= 0) {
+            alert("Por favor ingrese un nombre válido y un precio mayor a 0.");
+            return;
+        }
+
+        fetch("/api/productos/agregar-producto", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ nombre_producto: nombre, precio: precio })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("✅ Producto agregado correctamente.");
+                document.getElementById("form-agregar-producto").reset();
+            } else {
+                alert("❌ Error: " + (data.message || "No se pudo agregar el producto."));
             }
-
-            fetch("/api/productos/agregar-producto", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ nombre_producto: nombre, precio: precio, categoria: categoria })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert("✅ Producto agregado correctamente.");
-                    document.getElementById("form-agregar-producto").reset();
-                } else {
-                    alert("❌ Error: " + (data.message || "No se pudo agregar el producto."));
-                }
-            })
-            .catch(error => alert("❌ Error de conexión con el servidor."));
-        });
-    </script>
+        })
+        .catch(error => alert("❌ Error de conexión con el servidor."));
+    });
+</script>
     
     <button onclick="window.location.href='/views/empleado.html'" class="btn-atras">Atrás</button>
 </body>
