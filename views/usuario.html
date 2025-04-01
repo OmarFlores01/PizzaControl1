@@ -59,19 +59,28 @@
     <script>
         let carrito = [];
 
-        async function obtenerProductos() {
-            try {
-                const response = await fetch('/api/productos/obtener-productos');
-                const data = await response.json();
-                if (data.success) {
-                    mostrarProductos(data.productos);
-                } else {
-                    console.error("No se recibieron productos.");
-                }
-            } catch (error) {
-                console.error("Error al obtener productos:", error);
-            }
+const precios = {
+    "CHICA": 170,
+    "MEDIANA": 190,
+    "12 REBANADAS": 210,
+    "FAMILIAR": 230,
+    "GRANDE": 250,
+    "EXTRAFAMILIAR": 250
+};
+
+async function obtenerProductos() {
+    try {
+        const response = await fetch('/api/productos/obtener-productos');
+        const data = await response.json();
+        if (data.success) {
+            mostrarProductos(data.productos);
+        } else {
+            console.error("No se recibieron productos.");
         }
+    } catch (error) {
+        console.error("Error al obtener productos:", error);
+    }
+}
 
 function mostrarProductos(productos) {
     const tabla = document.getElementById('productos-lista');
@@ -91,82 +100,87 @@ function mostrarProductos(productos) {
     });
 }
 
+function agregarAlCarrito(nombre) {
+    let tamanio = prompt("Seleccione el tamaño: \nCHICA - $170\nMEDIANA - $190\n12 REBANADAS - $210\nFAMILIAR - $230\nGRANDE - $250\nEXTRAFAMILIAR - $250");
 
-        function agregarAlCarrito(nombre) {
-            const tamanio = prompt("Seleccione el tamaño: \nCHICA - $170\nMEDIANA - $190\n12 REBANADAS - $210\nFAMILIAR - $230\nGRANDE - $250\nEXTRAFAMILIAR - $250");
-            
-            const precios = {
-                "CHICA": 170,
-                "MEDIANA": 190,
-                "12 REBANADAS": 210,
-                "FAMILIAR": 230,
-                "GRANDE": 250,
-                "EXTRAFAMILIAR": 250
-            };
+    if (!precios[tamanio]) {
+        alert("Tamaño no válido.");
+        return;
+    }
 
-            if (!precios[tamanio]) {
-                alert("Tamaño no válido.");
-                return;
-            }
+    let productoEnCarrito = carrito.find(producto => producto.nombre === nombre && producto.tamanio === tamanio);
 
-            let productoEnCarrito = carrito.find(producto => producto.nombre === nombre && producto.tamanio === tamanio);
+    if (!productoEnCarrito) {
+        carrito.push({ nombre, tamanio, precio: precios[tamanio], cantidad: 1 });
+    } else {
+        productoEnCarrito.cantidad += 1;
+    }
 
-            if (!productoEnCarrito) {
-                carrito.push({ nombre, tamanio, precio: precios[tamanio], cantidad: 1 });
-            } else {
-                productoEnCarrito.cantidad += 1;
-            }
+    actualizarCarrito();
+}
 
-            actualizarCarrito();
-        }
+function actualizarCarrito() {
+    const tablaCarrito = document.getElementById('carrito-lista');
+    const btnFinalizar = document.getElementById('btn-finalizar');
+    tablaCarrito.innerHTML = '';
 
-        function actualizarCarrito() {
-            const tablaCarrito = document.getElementById('carrito-lista');
-            const btnFinalizar = document.getElementById('btn-finalizar');
-            tablaCarrito.innerHTML = '';
+    if (carrito.length === 0) {
+        tablaCarrito.innerHTML = '<tr><td colspan="6">Tu carrito está vacío.</td></tr>';
+        btnFinalizar.disabled = true;
+    } else {
+        carrito.forEach((producto, index) => {
+            const totalProducto = producto.precio * producto.cantidad;
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>${producto.nombre}</td>
+                <td>
+                    <select onchange="cambiarTamanio(${index}, this.value)">
+                        ${Object.keys(precios).map(tam => `<option value="${tam}" ${tam === producto.tamanio ? 'selected' : ''}>${tam}</option>`).join('')}
+                    </select>
+                </td>
+                <td id="precio-${index}">$${producto.precio.toFixed(2)}</td>
+                <td>
+                    <input type="number" value="${producto.cantidad}" min="1" onchange="cambiarCantidad(${index}, this.value)">
+                </td>
+                <td id="total-${index}">$${totalProducto.toFixed(2)}</td>
+                <td>
+                    <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
+                </td>
+            `;
+            tablaCarrito.appendChild(fila);
+        });
+        btnFinalizar.disabled = false;
+    }
+}
 
-            if (carrito.length === 0) {
-                tablaCarrito.innerHTML = '<tr><td colspan="6">Tu carrito está vacío.</td></tr>';
-                btnFinalizar.disabled = true;
-            } else {
-                carrito.forEach((producto, index) => {
-                    const totalProducto = producto.precio * producto.cantidad;
-                    const fila = document.createElement('tr');
-                    fila.innerHTML = `
-                        <td>${producto.nombre}</td>
-                        <td>${producto.tamanio}</td>
-                        <td>$${producto.precio.toFixed(2)}</td>
-                        <td>
-                            <input type="number" value="${producto.cantidad}" min="1" onchange="cambiarCantidad(${index}, this.value)">
-                        </td>
-                        <td>$${totalProducto.toFixed(2)}</td>
-                        <td>
-                            <button onclick="eliminarDelCarrito(${index})">Eliminar</button>
-                        </td>
-                    `;
-                    tablaCarrito.appendChild(fila);
-                });
-                btnFinalizar.disabled = false;
-            }
-        }
+function cambiarTamanio(index, nuevoTamanio) {
+    if (!precios[nuevoTamanio]) {
+        alert("Tamaño no válido.");
+        return;
+    }
+    carrito[index].tamanio = nuevoTamanio;
+    carrito[index].precio = precios[nuevoTamanio];
+    actualizarCarrito();
+}
 
-        function cambiarCantidad(index, nuevaCantidad) {
-            nuevaCantidad = parseInt(nuevaCantidad);
-            if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
-                alert("Cantidad inválida.");
-                actualizarCarrito();
-                return;
-            }
-            carrito[index].cantidad = nuevaCantidad;
-            actualizarCarrito();
-        }
+function cambiarCantidad(index, nuevaCantidad) {
+    nuevaCantidad = parseInt(nuevaCantidad);
+    if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
+        alert("Cantidad inválida.");
+        actualizarCarrito();
+        return;
+    }
+    carrito[index].cantidad = nuevaCantidad;
+    actualizarCarrito();
+}
 
-        function eliminarDelCarrito(index) {
-            carrito.splice(index, 1);
-            actualizarCarrito();
-        }
+function eliminarDelCarrito(index) {
+    carrito.splice(index, 1);
+    actualizarCarrito();
+}
 
-        window.addEventListener('DOMContentLoaded', obtenerProductos);
+window.addEventListener('DOMContentLoaded', obtenerProductos);
+
     </script>
 </body>
 </html>
