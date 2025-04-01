@@ -22,7 +22,7 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Aquí se generarán los productos dinámicamente -->
+                <!-- Productos generados dinámicamente -->
             </tbody>
         </table>
     </div>
@@ -40,7 +40,7 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Aquí se generarán los pedidos seleccionados dinámicamente -->
+                <!-- Pedidos seleccionados dinámicamente -->
             </tbody>
         </table>
         <button id="confirmar-pedido" disabled>Confirmar Pedido</button>
@@ -70,28 +70,24 @@
             
             productos.forEach(producto => {
                 const precio = Number(producto.Precio);
-                const nombreDecodificado = decodeURIComponent(producto.Nombre);
+                const nombre = decodeURIComponent(producto.Nombre);
 
-                if (isNaN(precio) || !nombreDecodificado) {
-                    console.error(❌ Producto inválido: ${producto.Nombre} - Precio: ${producto.Precio});
+                if (isNaN(precio) || !nombre) {
+                    console.error(`Producto inválido: ${producto.Nombre} - Precio: ${producto.Precio}`);
                     return;
                 }
 
                 const fila = document.createElement('tr');
-                fila.innerHTML = 
-                    <td>${nombreDecodificado}</td>
+                fila.innerHTML = `
+                    <td>${nombre}</td>
                     <td>$${precio.toFixed(2)}</td>
-                    <td><button onclick='agregarAlCarrito(${producto.ID_Producto}, "${nombreDecodificado}", ${precio})'>Añadir</button></td>
-                ;
+                    <td><button onclick='agregarAlCarrito(${producto.ID_Producto}, "${nombre}", ${precio})'>Añadir</button></td>
+                `;
                 tabla.appendChild(fila);
             });
         }
 
         function agregarAlCarrito(id, nombre, precio) {
-            if (!nombre || isNaN(precio)) {
-                console.error("❌ No se puede agregar un producto inválido.");
-                return;
-            }
             let productoEnCarrito = carrito.find(producto => producto.id === id);
             if (!productoEnCarrito) {
                 carrito.push({ id, nombre, precio, cantidad: 1 });
@@ -115,13 +111,13 @@
             carrito.forEach((producto, index) => {
                 const totalProducto = producto.precio * producto.cantidad;
                 const fila = document.createElement('tr');
-                fila.innerHTML = 
+                fila.innerHTML = `
                     <td>${producto.nombre}</td>
                     <td>$${producto.precio.toFixed(2)}</td>
                     <td><input type="number" value="${producto.cantidad}" min="1" onchange="cambiarCantidad(${index}, this.value)"></td>
                     <td>$${totalProducto.toFixed(2)}</td>
                     <td><button onclick="eliminarDelCarrito(${index})">Eliminar</button></td>
-                ;
+                `;
                 tablaCarrito.appendChild(fila);
             });
 
