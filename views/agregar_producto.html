@@ -25,88 +25,82 @@
             </select>
 
             <label for="tamanio">Tamaño:</label>
-<select id="tamanio">
-    <option value="">-- Selecciona el Tamaño --</option>
-    <option value="CHICA">CHICA - $170</option>
-    <option value="MEDIANA">MEDIANA - $190</option>
-    <option value="12 REBANADAS">12 REBANADAS - $210</option>
-    <option value="FAMILIAR">FAMILIAR - $230</option>
-    <option value="GRANDE">GRANDE - $250</option>
-    <option value="EXTRAFAMILIAR">EXTRAFAMILIAR - $250</option>
-</select>
-<p>Precio: <span id="precio"></span></p>
-
-
+            <select id="tamanio">
+                <option value="">-- Selecciona el Tamaño --</option>
+                <option value="CHICA">CHICA - $170</option>
+                <option value="MEDIANA">MEDIANA - $190</option>
+                <option value="12 REBANADAS">12 REBANADAS - $210</option>
+                <option value="FAMILIAR">FAMILIAR - $230</option>
+                <option value="GRANDE">GRANDE - $250</option>
+                <option value="EXTRAFAMILIAR">EXTRAFAMILIAR - $250</option>
+            </select>
+            <p>Precio: <span id="precio"></span></p>
 
             <button type="submit">Agregar Producto</button>
         </form>
     </div>
 
     <button onclick="window.location.href='/views/empleado.html'" class="btn-atras">Atrás</button>
-<script>
-    document.getElementById("categoria").addEventListener("change", function() {
-        const nombreInput = document.getElementById("nombre_producto");
-        const categoria = this.value.trim();
-        let nombreSinCategoria = nombreInput.value.replace(/^(Pepperoni|Hawaiana|Mexicana|Tres Quesos|Carnes Frias) /, '').trim();
-        
-        if (categoria) {
-            nombreInput.value = `${nombreSinCategoria} ${categoria}`.trim();
-        } else {
-            nombreInput.value = nombreSinCategoria;
-        }
-    });
 
-    document.getElementById("tamanio").addEventListener("change", function() {
-        const precioSpan = document.getElementById("precio");
-        const tamanio = this.value;
-        
-        let precio;
-        switch (tamanio) {
-            case "CHICA": precio = 170; break;
-            case "MEDIANA": precio = 190; break;
-            case "12 REBANADAS": precio = 210; break;
-            case "FAMILIAR": precio = 230; break;
-            case "GRANDE": precio = 250; break;
-            case "EXTRAFAMILIAR": precio = 250; break;
-            default: precio = null; break;
-        }
-        
-        precioSpan.textContent = precio ? `$${precio}` : "";
-    });
+    <script>
+        document.getElementById("categoria").addEventListener("change", function() {
+            const nombreInput = document.getElementById("nombre_producto");
+            const categoria = this.value.trim();
+            let nombreSinCategoria = nombreInput.value.replace(/^(Pepperoni|Hawaiana|Mexicana|Tres Quesos|Carnes Frias) /, '').trim();
+            
+            if (categoria) {
+                nombreInput.value = `${nombreSinCategoria} ${categoria}`.trim();
+            } else {
+                nombreInput.value = nombreSinCategoria;
+            }
+        });
 
-    document.getElementById("form-agregar-producto").addEventListener("submit", function(event) {
-    event.preventDefault();
+        document.getElementById("tamanio").addEventListener("change", function() {
+            const precioSpan = document.getElementById("precio");
+            const tamanio = this.value;
+            
+            let precios = {
+                "CHICA": 170,
+                "MEDIANA": 190,
+                "12 REBANADAS": 210,
+                "FAMILIAR": 230,
+                "GRANDE": 250,
+                "EXTRAFAMILIAR": 250
+            };
 
-    const nombre = document.getElementById("nombre_producto").value.trim();
-    const tamanio = document.getElementById("tamanio").value;
-    const precio = document.getElementById("precio").textContent.replace('$', '').trim();
+            let precio = precios[tamanio] || "";
+            precioSpan.textContent = precio ? `$${precio}` : "";
+        });
 
-    if (!nombre || !tamanio || !precio) {
-        alert("Por favor ingrese un nombre válido, seleccione un tamaño y verifique el precio.");
-        return;
-    }
+        document.getElementById("form-agregar-producto").addEventListener("submit", function(event) {
+            event.preventDefault();
 
-    fetch("/api/productos/agregar-producto", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre_producto: nombre, tamanio: tamanio, precio: parseFloat(precio) })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert("✅ Producto agregado correctamente.");
-            document.getElementById("form-agregar-producto").reset();
-            document.getElementById("precio").textContent = "";
-        } else {
-            alert("❌ Error: " + (data.message || "No se pudo agregar el producto."));
-        }
-    })
-    .catch(error => alert("❌ Error de conexión con el servidor."));
-});
+            const nombre = document.getElementById("nombre_producto").value.trim();
+            const tamanio = document.getElementById("tamanio").value;
+            const precio = document.getElementById("precio").textContent.replace('$', '').trim();
 
-</script>
+            if (!nombre || !tamanio || !precio) {
+                alert("Por favor ingrese un nombre válido, seleccione un tamaño y verifique el precio.");
+                return;
+            }
 
-    
-    <button onclick="window.location.href='/views/empleado.html'" class="btn-atras">Atrás</button>
+            fetch("/api/productos/agregar-producto", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nombre_producto: nombre, tamanio: tamanio, precio: parseFloat(precio) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("✅ Producto agregado correctamente.");
+                    document.getElementById("form-agregar-producto").reset();
+                    document.getElementById("precio").textContent = "";
+                } else {
+                    alert("❌ Error: " + (data.message || "No se pudo agregar el producto."));
+                }
+            })
+            .catch(error => alert("❌ Error de conexión con el servidor."));
+        });
+    </script>
 </body>
 </html>
