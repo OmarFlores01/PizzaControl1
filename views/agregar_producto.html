@@ -14,12 +14,51 @@
         <form id="form-agregar-producto">
             <input type="text" name="nombre_producto" id="nombre_producto" placeholder="Nombre del Producto" required>
             <input type="number" name="precio" id="precio" placeholder="Precio" step="0.01" min="0" required>
+            
+            <label for="categoria">Categoría:</label>
+            <select name="categoria" id="categoria">
+                <option value="">-- Sin Categoría --</option>
+                <option value="Pepperoni">Pepperoni</option>
+                <option value="Hawaiana">Hawaiana</option>
+                <option value="Mexicana">Mexicana</option>
+                <option value="Tres Quesos">Tres Quesos</option>
+                <option value="Carnes Frias">Carnes Frías</option>
+            </select>
+            
             <button type="submit">Agregar Producto</button>
         </form>
     </div>
 
-    <script src="/assets/script/producto/agregar_producto.js"></script>
-    <button onclick="window.location.href='/views/empleado.html'" class="btn-atras">Atrás</button>
+    <script>
+        document.getElementById("form-agregar-producto").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const nombre = document.getElementById("nombre_producto").value.trim();
+            const precio = parseFloat(document.getElementById("precio").value);
+            const categoria = document.getElementById("categoria").value.trim() || null;
 
+            if (!nombre || precio <= 0) {
+                alert("Por favor ingrese un nombre válido y un precio mayor a 0.");
+                return;
+            }
+
+            fetch("/api/productos/agregar-producto", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nombre_producto: nombre, precio: precio, categoria: categoria })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("✅ Producto agregado correctamente.");
+                    document.getElementById("form-agregar-producto").reset();
+                } else {
+                    alert("❌ Error: " + (data.message || "No se pudo agregar el producto."));
+                }
+            })
+            .catch(error => alert("❌ Error de conexión con el servidor."));
+        });
+    </script>
+    
+    <button onclick="window.location.href='/views/empleado.html'" class="btn-atras">Atrás</button>
 </body>
 </html>
