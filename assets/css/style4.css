@@ -59,8 +59,7 @@ th {
     background-color: #444;
 }
 
-/* Botón de atrás */
-.btn-atras {
+.back-button {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -74,7 +73,7 @@ th {
     transition: background-color 0.3s ease;
 }
 
-.btn-atras:hover {
+.back-button:hover {
     background-color: #c0392b;
 }
 .btn-atras {
