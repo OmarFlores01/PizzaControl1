@@ -88,7 +88,7 @@
 
         async function obtenerProductos() {
             try {
-                const response = await fetch('/api/productos/obtener-productos');
+                const response = await fetch('/api/cliente/obteners-productos');
                 const data = await response.json();
                 if (data.success) {
                     mostrarProductos(data.productos);
