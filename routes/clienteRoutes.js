@@ -65,16 +65,16 @@ router.get('/obtener-pedidos-cliente/:id_cliente', (req, res) => {
 
 // Obtener productos
 router.get('/obtener-productos', (req, res) => {
-    const query = "SELECT ID_Producto, Nombre, Precio FROM productos;"; // Agregar la columna Precio
+    const query = 'SELECT ID_Producto, Nombre, Tamanio, Precio FROM producto';
     db.query(query, (err, results) => {
         if (err) {
-            console.error('❌ Error al obtener productos:', err.message);
+            console.error('Error al obtener productos:', err);
             return res.status(500).json({ success: false, message: 'Error al obtener productos' });
         }
-        console.log("Productos enviados:", results);
         res.json({ success: true, productos: results });
     });
 });
+
 
 
 
