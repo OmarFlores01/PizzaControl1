@@ -75,33 +75,35 @@
     });
 
     document.getElementById("form-agregar-producto").addEventListener("submit", function(event) {
-        event.preventDefault();
-        const nombre = document.getElementById("nombre_producto").value.trim();
-        const tamanio = document.getElementById("tamanio").value;
-        const precio = document.getElementById("precio").textContent.replace('$', '');
-        
-        if (!nombre || !precio) {
-            alert("Por favor ingrese un nombre válido y seleccione un tamaño.");
-            return;
-        }
+    event.preventDefault();
 
-        fetch("/api/productos/agregar-producto", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ nombre_producto: nombre, precio: parseFloat(precio) })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert("✅ Producto agregado correctamente.");
-                document.getElementById("form-agregar-producto").reset();
-                document.getElementById("precio").textContent = "";
-            } else {
-                alert("❌ Error: " + (data.message || "No se pudo agregar el producto."));
-            }
-        })
-        .catch(error => alert("❌ Error de conexión con el servidor."));
-    });
+    const nombre = document.getElementById("nombre_producto").value.trim();
+    const tamanio = document.getElementById("tamanio").value;
+    const precio = document.getElementById("precio").textContent.replace('$', '').trim();
+
+    if (!nombre || !tamanio || !precio) {
+        alert("Por favor ingrese un nombre válido, seleccione un tamaño y verifique el precio.");
+        return;
+    }
+
+    fetch("/api/productos/agregar-producto", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre_producto: nombre, tamanio: tamanio, precio: parseFloat(precio) })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("✅ Producto agregado correctamente.");
+            document.getElementById("form-agregar-producto").reset();
+            document.getElementById("precio").textContent = "";
+        } else {
+            alert("❌ Error: " + (data.message || "No se pudo agregar el producto."));
+        }
+    })
+    .catch(error => alert("❌ Error de conexión con el servidor."));
+});
+
 </script>
 
     
