@@ -13,7 +13,6 @@
         <h1>Agregar Producto</h1>
         <form id="form-agregar-producto">
             <input type="text" name="nombre_producto" id="nombre_producto" placeholder="Nombre del Producto" required>
-            <input type="number" name="precio" id="precio" placeholder="Precio" step="0.01" min="0" required>
             
             <label for="categoria">Ingrediente:</label>
             <select name="categoria" id="categoria">
@@ -35,14 +34,17 @@
     <option value="GRANDE">GRANDE - $250</option>
     <option value="EXTRAFAMILIAR">EXTRAFAMILIAR - $250</option>
 </select>
-            
+
+<label for="precio">Precio:</label>
+<span id="precio"></span>
+                        <input type="number" name="precio" id="precio" placeholder="Precio" step="0.01" min="0" required>
+
             <button type="submit">Agregar Producto</button>
         </form>
     </div>
 
     
-            
-     <script>
+<script>
     document.getElementById("categoria").addEventListener("change", function() {
         const nombreInput = document.getElementById("nombre_producto");
         const categoria = this.value.trim();
@@ -55,11 +57,9 @@
         }
     });
 
-    document.getElementById("form-agregar-producto").addEventListener("submit", function(event) {
-        event.preventDefault();
-        const nombre = document.getElementById("nombre_producto").value.trim();
-        const precioInput = document.getElementById("precio");
-        const tamanio = document.getElementById("tamanio").value;
+    document.getElementById("tamanio").addEventListener("change", function() {
+        const precioSpan = document.getElementById("precio");
+        const tamanio = this.value;
         
         let precio;
         switch (tamanio) {
@@ -69,26 +69,34 @@
             case "FAMILIAR": precio = 230; break;
             case "GRANDE": precio = 250; break;
             case "EXTRAFAMILIAR": precio = 250; break;
-            default: precio = 0; break;
+            default: precio = null; break;
         }
         
-        precioInput.value = precio;
+        precioSpan.textContent = precio ? `$${precio}` : "";
+    });
+
+    document.getElementById("form-agregar-producto").addEventListener("submit", function(event) {
+        event.preventDefault();
+        const nombre = document.getElementById("nombre_producto").value.trim();
+        const tamanio = document.getElementById("tamanio").value;
+        const precio = document.getElementById("precio").textContent.replace('$', '');
         
-        if (!nombre || precio <= 0) {
-            alert("Por favor ingrese un nombre válido y un precio mayor a 0.");
+        if (!nombre || !precio) {
+            alert("Por favor ingrese un nombre válido y seleccione un tamaño.");
             return;
         }
 
         fetch("/api/productos/agregar-producto", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ nombre_producto: nombre, precio: precio })
+            body: JSON.stringify({ nombre_producto: nombre, precio: parseFloat(precio) })
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
                 alert("✅ Producto agregado correctamente.");
                 document.getElementById("form-agregar-producto").reset();
+                document.getElementById("precio").textContent = "";
             } else {
                 alert("❌ Error: " + (data.message || "No se pudo agregar el producto."));
             }
