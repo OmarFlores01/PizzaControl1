@@ -69,6 +69,10 @@ button:hover {
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
+
+.back-button:hover {
+    background-color: #c0392b;
+}
 .btn-atras {
     display: block;
     width: 150px;
