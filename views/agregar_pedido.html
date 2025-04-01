@@ -3,175 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agregar Pedido - Empleado</title>
-    <link rel="stylesheet" href="../assets/css/styles.css">
+    <title>Agregar Producto</title>
+    <link rel="stylesheet" href="/assets/css/style6.css">
     <link rel="stylesheet" href="/assets/logout.css">
 </head>
 <body>
     <a href="/views/login.html" class="logout">Cerrar sesión</a>
-    <h1>Agregar Pedido</h1>
-    
-    <div class="productos-container">
-        <h2>Productos Disponibles</h2>
-        <table id="productos-lista">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Precio</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Aquí se generarán los productos dinámicamente -->
-            </tbody>
-        </table>
+    <div class="container">
+        <h1>Agregar Producto</h1>
+        <form id="form-agregar-producto">
+            <input type="text" name="nombre_producto" id="nombre_producto" placeholder="Nombre del Producto" required>
+            <input type="number" name="precio" id="precio" placeholder="Precio" step="0.01" min="0" required>
+            
+            <label for="categoria">Categoría:</label>
+            <select name="categoria" id="categoria">
+                <option value="">-- Sin Categoría --</option>
+                <option value="Pepperoni">Pepperoni</option>
+                <option value="Hawaiana">Hawaiana</option>
+                <option value="Mexicana">Mexicana</option>
+                <option value="Tres Quesos">Tres Quesos</option>
+                <option value="Carnes Frias">Carnes Frías</option>
+            </select>
+            
+            <button type="submit">Agregar Producto</button>
+        </form>
     </div>
-    
-    <div class="carrito-container">
-        <h2>Carrito de Pedidos</h2>
-        <table id="carrito-lista">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Precio</th>
-                    <th>Cantidad</th>
-                    <th>Total</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Aquí se generarán los pedidos seleccionados dinámicamente -->
-            </tbody>
-        </table>
-        <button id="confirmar-pedido" disabled>Confirmar Pedido</button>
-    </div>
-    <button onclick="window.location.href='/views/empleado.html'" class="btn-atras">Atrás</button>
 
     <script>
-       let carrito = [];
+        document.getElementById("form-agregar-producto").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const nombre = document.getElementById("nombre_producto").value.trim();
+            const precio = parseFloat(document.getElementById("precio").value);
+            const categoria = document.getElementById("categoria").value.trim() || null;
 
-document.addEventListener('DOMContentLoaded', () => {
-    obtenerProductos();
-    document.getElementById('confirmar-pedido').addEventListener('click', finalizarPedido);
-});
+            if (!nombre || precio <= 0) {
+                alert("Por favor ingrese un nombre válido y un precio mayor a 0.");
+                return;
+            }
 
-async function obtenerProductos() {
-    try {
-        const response = await fetch('/api/productos/obtener-productos');
-        const data = await response.json();
-        if (data.success) {
-            mostrarProductos(data.productos);
-        } else {
-            console.error("No se recibieron productos.");
-        }
-    } catch (error) {
-        console.error("Error al obtener productos:", error);
-    }
-}
-
-function mostrarProductos(productos) {
-    const tabla = document.querySelector('#productos-lista tbody');
-    tabla.innerHTML = '';
-    
-    productos.forEach(producto => {
-        const precio = Number(producto.Precio);
-        const nombreDecodificado = decodeURIComponent(producto.Nombre);
-
-        if (isNaN(precio) || !nombreDecodificado) {
-            console.error(`❌ Producto inválido: ${producto.Nombre} - Precio: ${producto.Precio}`);
-            return;
-        }
-
-        const fila = document.createElement('tr');
-        fila.innerHTML = `
-            <td>${nombreDecodificado}</td>
-            <td>$${precio.toFixed(2)}</td>
-            <td><button onclick='agregarAlCarrito(${producto.ID_Producto}, "${nombreDecodificado}", ${precio})'>Añadir</button></td>
-        `;
-        tabla.appendChild(fila);
-    });
-}
-
-function agregarAlCarrito(id, nombre, precio) {
-    let productoEnCarrito = carrito.find(producto => producto.id === id);
-    if (!productoEnCarrito) {
-        carrito.push({ id, nombre, precio, cantidad: 1 });
-    } else {
-        productoEnCarrito.cantidad += 1;
-    }
-    actualizarCarrito();
-}
-
-function actualizarCarrito() {
-    const tablaCarrito = document.querySelector('#carrito-lista tbody');
-    const btnFinalizar = document.getElementById('confirmar-pedido');
-    tablaCarrito.innerHTML = '';
-
-    if (carrito.length === 0) {
-        tablaCarrito.innerHTML = '<tr><td colspan="5">Tu carrito está vacío.</td></tr>';
-        btnFinalizar.disabled = true;
-        return;
-    }
-
-    carrito.forEach((producto, index) => {
-        const totalProducto = producto.precio * producto.cantidad;
-        const fila = document.createElement('tr');
-        fila.innerHTML = `
-            <td>${producto.nombre}</td>
-            <td>$${producto.precio.toFixed(2)}</td>
-            <td><input type="number" value="${producto.cantidad}" min="1" onchange="cambiarCantidad(${index}, this.value)"></td>
-            <td>$${totalProducto.toFixed(2)}</td>
-            <td><button onclick="eliminarDelCarrito(${index})">Eliminar</button></td>
-        `;
-        tablaCarrito.appendChild(fila);
-    });
-
-    btnFinalizar.disabled = false;
-}
-
-function cambiarCantidad(index, nuevaCantidad) {
-    nuevaCantidad = parseInt(nuevaCantidad);
-    if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
-        alert("La cantidad debe ser un número válido y mayor a 0.");
-        actualizarCarrito();
-        return;
-    }
-    carrito[index].cantidad = nuevaCantidad;
-    actualizarCarrito();
-}
-
-function eliminarDelCarrito(index) {
-    carrito.splice(index, 1);
-    actualizarCarrito();
-}
-
-async function finalizarPedido() {
-    if (carrito.length === 0) {
-        alert("Tu carrito está vacío.");
-        return;
-    }
-
-    try {
-        const response = await fetch('/api/pedidos/finalizar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_cliente: 1, productos: carrito })
+            fetch("/api/productos/agregar-producto", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ nombre_producto: nombre, precio: precio, categoria: categoria })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("✅ Producto agregado correctamente.");
+                    document.getElementById("form-agregar-producto").reset();
+                } else {
+                    alert("❌ Error: " + (data.message || "No se pudo agregar el producto."));
+                }
+            })
+            .catch(error => alert("❌ Error de conexión con el servidor."));
         });
-        const data = await response.json();
-
-        if (data.success) {
-            alert("Pedido finalizado con éxito.");
-            carrito = [];
-            actualizarCarrito();
-        } else {
-            alert("Error al finalizar el pedido: " + data.message);
-        }
-    } catch (error) {
-        console.error("Error al finalizar el pedido:", error);
-    }
-}
-
-        window.addEventListener('DOMContentLoaded', obtenerProductos);
     </script>
+    
+    <button onclick="window.location.href='/views/empleado.html'" class="btn-atras">Atrás</button>
 </body>
 </html>
