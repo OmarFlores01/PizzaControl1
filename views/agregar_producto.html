@@ -50,7 +50,7 @@
         let nombreSinCategoria = nombreInput.value.replace(/^(Pepperoni|Hawaiana|Mexicana|Tres Quesos|Carnes Frias) /, '').trim();
         
         if (categoria) {
-            nombreInput.value = ${nombreSinCategoria} ${categoria}.trim();
+            nombreInput.value = `${nombreSinCategoria} ${categoria}`.trim();
         } else {
             nombreInput.value = nombreSinCategoria;
         }
@@ -71,7 +71,7 @@
             default: precio = null; break;
         }
         
-        precioSpan.textContent = precio ? $${precio} : "";
+        precioSpan.textContent = precio ? `$${precio}` : "";
     });
 
     document.getElementById("form-agregar-producto").addEventListener("submit", function(event) {
@@ -103,6 +103,7 @@
         .catch(error => alert("❌ Error de conexión con el servidor."));
     });
 </script>
+
     
     <button onclick="window.location.href='/views/empleado.html'" class="btn-atras">Atrás</button>
 </body>
