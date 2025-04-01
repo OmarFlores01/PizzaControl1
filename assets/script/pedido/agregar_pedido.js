@@ -112,11 +112,32 @@ async function finalizarPedido() {
         return;
     }
 
-    const response = await fetch('/finalizar', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id_cliente: 1, productos: carrito })
-    });
+    const id_cliente = localStorage.getItem('id_cliente');
+    if (!id_cliente) {
+        alert("Error: No hay cliente registrado.");
+        return;
+    }
+
+    try {
+        const response = await fetch('/finalizar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_cliente, productos: carrito })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            alert("Pedido finalizado con éxito.");
+            carrito = [];
+            actualizarCarrito();
+        } else {
+            alert("Error al finalizar el pedido: " + (data.message || "Desconocido"));
+        }
+    } catch (error) {
+        console.error("Error en finalizarPedido:", error);
+        alert("Hubo un problema al conectar con el servidor.");
+    }
+}
 
     const data = await response.json();
     if (data.success) {
