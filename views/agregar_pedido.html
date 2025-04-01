@@ -60,30 +60,30 @@
 }
 
         function mostrarProductos(productos) {
-            const tabla = document.getElementById('productos-lista');
-            tabla.innerHTML = '';
+    const tabla = document.getElementById('productos-lista');
+    tabla.innerHTML = '';
 
-            productos.forEach(producto => {
-                const precio = Number(producto.Precio);
-                const nombreDecodificado = decodeURIComponent(producto.Nombre);
+    productos.forEach(producto => {
+        const precio = Number(producto.Precio);
+        const nombreDecodificado = decodeURIComponent(producto.Nombre);
 
-                if (isNaN(precio) || !nombreDecodificado) {
-                    console.error(`❌ Producto inválido: ${producto.Nombre} - Precio: ${producto.Precio}`);
-                    return;
-                }
-
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td>${nombreDecodificado}</td>
-                    <td>$${precio.toFixed(2)}</td>
-                    <td>
-                        <button onclick='agregarAlCarrito(${producto.ID_Producto}, "${nombreDecodificado}", ${precio})'>Añadir</button>
-                    </td>
-                `;
-                tabla.appendChild(fila);
-            });
+        if (isNaN(precio) || !nombreDecodificado) {
+            console.error(`❌ Producto inválido: ${producto.Nombre} - Precio: ${producto.Precio}`);
+            return;
         }
 
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${nombreDecodificado}</td>
+            <td>$${precio.toFixed(2)}</td>
+            <td>
+                <button onclick='agregarAlCarrito(${producto.ID_Producto}, "${nombreDecodificado}", ${precio})'>Añadir</button>
+            </td>
+        `;
+
+        tabla.appendChild(fila);
+    });
+}
         function agregarAlCarrito(id, nombre, precio) {
             let productoEnCarrito = carrito.find(producto => producto.id === id);
 
