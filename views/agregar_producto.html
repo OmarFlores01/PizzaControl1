@@ -15,7 +15,7 @@
             <input type="text" name="nombre_producto" id="nombre_producto" placeholder="Nombre del Producto" required>
             <input type="number" name="precio" id="precio" placeholder="Precio" step="0.01" min="0" required>
             
-            <label for="categoria">Categoría:</label>
+            <label for="categoria">Ingrediente:</label>
             <select name="categoria" id="categoria">
                 <option value="">-- Sin Categoría --</option>
                 <option value="Pepperoni">Pepperoni</option>
@@ -24,29 +24,56 @@
                 <option value="Tres Quesos">Tres Quesos</option>
                 <option value="Carnes Frias">Carnes Frías</option>
             </select>
+
+            <label for="tamanio">Tamaño:</label>
+<select id="tamanio">
+    <option value="">-- Selecciona el Tamaño --</option>
+    <option value="CHICA">CHICA - $170</option>
+    <option value="MEDIANA">MEDIANA - $190</option>
+    <option value="12 REBANADAS">12 REBANADAS - $210</option>
+    <option value="FAMILIAR">FAMILIAR - $230</option>
+    <option value="GRANDE">GRANDE - $250</option>
+    <option value="EXTRAFAMILIAR">EXTRAFAMILIAR - $250</option>
+</select>
             
             <button type="submit">Agregar Producto</button>
         </form>
     </div>
 
     
-            <script>
+            
+     <script>
     document.getElementById("categoria").addEventListener("change", function() {
         const nombreInput = document.getElementById("nombre_producto");
         const categoria = this.value.trim();
+        let nombreSinCategoria = nombreInput.value.replace(/^(Pepperoni|Hawaiana|Mexicana|Tres Quesos|Carnes Frias) /, '').trim();
         
         if (categoria) {
-            nombreInput.value = `${categoria} ${nombreInput.value.replace(/^(Pepperoni|Hawaiana|Mexicana|Tres Quesos|Carnes Frias) /, '')}`.trim();
+            nombreInput.value = `${nombreSinCategoria} ${categoria}`.trim();
         } else {
-            nombreInput.value = nombreInput.value.replace(/^(Pepperoni|Hawaiana|Mexicana|Tres Quesos|Carnes Frias) /, '').trim();
+            nombreInput.value = nombreSinCategoria;
         }
     });
 
     document.getElementById("form-agregar-producto").addEventListener("submit", function(event) {
         event.preventDefault();
         const nombre = document.getElementById("nombre_producto").value.trim();
-        const precio = parseFloat(document.getElementById("precio").value);
-
+        const precioInput = document.getElementById("precio");
+        const tamanio = document.getElementById("tamanio").value;
+        
+        let precio;
+        switch (tamanio) {
+            case "CHICA": precio = 170; break;
+            case "MEDIANA": precio = 190; break;
+            case "12 REBANADAS": precio = 210; break;
+            case "FAMILIAR": precio = 230; break;
+            case "GRANDE": precio = 250; break;
+            case "EXTRAFAMILIAR": precio = 250; break;
+            default: precio = 0; break;
+        }
+        
+        precioInput.value = precio;
+        
         if (!nombre || precio <= 0) {
             alert("Por favor ingrese un nombre válido y un precio mayor a 0.");
             return;
