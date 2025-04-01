@@ -2,17 +2,62 @@ let carrito = [];
 
 async function obtenerProductos() {
     try {
-        const response = await fetch('/api/productos/obtener-productos');
-        const data = await response.json();
-        if (data.success) {
-            mostrarProductos(data.productos);
-        } else {
-            console.error("No se recibieron productos.");
-        }
+        const response = await fetch('/obtener-productos');
+        const productos = await response.json();
+        mostrarProductos(productos);
     } catch (error) {
         console.error("Error al obtener productos:", error);
     }
 }
+
+document.addEventListener("DOMContentLoaded", obtenerProductos);
+
+function mostrarProductos(productos) {
+    const tablaProductos = document.getElementById("tabla-productos");
+    tablaProductos.innerHTML = "";
+    
+    productos.forEach(producto => {
+        const { ID_Producto, Nombre, Precio } = producto;
+        if (!Nombre || isNaN(Precio)) {
+            console.error(`Producto inválido: ${Nombre} - Precio: ${Precio}`);
+            return;
+        }
+
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${Nombre}</td>
+            <td>$${Precio.toFixed(2)}</td>
+            <td><button onclick='agregarAlCarrito(${ID_Producto}, "${Nombre}", ${Precio})'>Añadir</button></td>
+        `;
+        tablaProductos.appendChild(fila);
+    });
+}
+
+function agregarAlCarrito(id, nombre, precio) {
+    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    carrito.push({ id, nombre, precio });
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    actualizarCarrito();
+}
+
+function actualizarCarrito() {
+    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    const tablaCarrito = document.getElementById("tabla-carrito");
+    tablaCarrito.innerHTML = "";
+    let total = 0;
+    
+    carrito.forEach(({ nombre, precio }) => {
+        total += precio;
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+            <td>${nombre}</td>
+            <td>$${precio.toFixed(2)}</td>
+        `;
+        tablaCarrito.appendChild(fila);
+    });
+    document.getElementById("total").textContent = `$${total.toFixed(2)}`;
+}
+
 
 function mostrarProductos(productos) {
     const tabla = document.getElementById('productos-lista');
