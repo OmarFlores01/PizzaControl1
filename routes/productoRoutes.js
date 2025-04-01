@@ -26,7 +26,8 @@ router.post('/agregar-producto', (req, res) => {
 
 // Obtener todos los productos
 router.get('/obtener-productos', (req, res) => {
-    db.query('SELECT * FROM producto', (err, results) => { // Cambiado 'productos' a 'producto'
+    const query = 'SELECT ID_Producto, Nombre FROM producto'; // No incluir Tamanio ni Precio aquí
+    db.query(query, (err, results) => {
         if (err) {
             console.error('Error al obtener productos:', err);
             return res.status(500).json({ success: false, message: 'Error al obtener productos' });
@@ -34,6 +35,7 @@ router.get('/obtener-productos', (req, res) => {
         res.json({ success: true, productos: results });
     });
 });
+
 
 // Obtener un producto por ID
 router.get('/obtener-producto/:id', (req, res) => {
