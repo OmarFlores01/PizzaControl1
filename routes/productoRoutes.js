@@ -26,7 +26,7 @@ router.post('/agregar-producto', (req, res) => {
 
 // Obtener todos los productos
 router.get('/obtener-productos', (req, res) => {
-    const query = 'SELECT ID_Producto, Nombre FROM producto'; // No incluir Tamanio ni Precio aquí
+    const query = 'SELECT ID_Producto, Nombre, Precio FROM producto'; // No incluir Tamanio ni Precio aquí
     db.query(query, (err, results) => {
         if (err) {
             console.error('Error al obtener productos:', err);
