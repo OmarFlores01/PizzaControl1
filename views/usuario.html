@@ -209,6 +209,41 @@
         document.getElementById("modal-pago").style.display = "none";
     }
 
+         // Función para actualizar la cantidad del producto en el carrito
+    function actualizarCantidad(index, cantidad) {
+        // Asegurarse de que la cantidad sea un número válido y mayor que 0
+        cantidad = parseInt(cantidad);
+        if (isNaN(cantidad) || cantidad <= 0) {
+            alert("La cantidad debe ser un número mayor a 0.");
+            return;
+        }
+
+        // Actualizar la cantidad en el carrito
+        carrito[index].cantidad = cantidad;
+
+        // Actualizar la tabla del carrito
+        actualizarTablaCarrito();
+    }
+
+    function actualizarTablaCarrito() {
+        const tablaCarrito = document.getElementById('carrito-lista');
+        tablaCarrito.innerHTML = '';
+
+        carrito.forEach((producto, index) => {
+            const totalProducto = producto.precio * producto.cantidad;
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>${producto.nombre}</td>
+                <td>${producto.tamanio}</td>
+                <td>$${producto.precio.toFixed(2)}</td>
+                <td><input type="number" value="${producto.cantidad}" min="1" onchange="actualizarCantidad(${index}, this.value)"></td>
+                <td>$${totalProducto.toFixed(2)}</td>
+                <td><button onclick="eliminarProductoCarrito(${index})">Eliminar</button></td>
+            `;
+            tablaCarrito.appendChild(fila);
+        });
+    }
+
 
         window.addEventListener('DOMContentLoaded', cargarProductos);
     </script>
