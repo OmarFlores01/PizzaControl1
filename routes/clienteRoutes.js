@@ -3,10 +3,10 @@ const router = express.Router();
 const db = require('../models/config/db'); // Verifica que esté bien configurado
 
 // Obtener tamaños y precios de una pizza por nombre
-router.get('/api/cliente/obtener-tamanios/:nombre', async (req, res) => {
-    const nombre = req.params.nombre; // 👈 Aquí tomamos el parámetro de la URL
+router.get('/obtener-tamanios/:nombre', async (req, res) => {
+    const nombre = req.params.nombre;
     console.log("🔎 Nombre recibido:", nombre);
-    
+
     if (!nombre) {
         return res.status(400).json({ success: false, message: "Falta el nombre del producto." });
     }
@@ -15,7 +15,7 @@ router.get('/api/cliente/obtener-tamanios/:nombre', async (req, res) => {
     console.log("📡 Consultando tamaños para:", nombreLimpio);
 
     const query = 'SELECT TRIM(Tamanio) AS Tamanio, Precio FROM producto WHERE LOWER(TRIM(Nombre)) = LOWER(TRIM(?))';
-    
+
     try {
         const [rows] = await db.query(query, [nombreLimpio]);
 
@@ -29,7 +29,6 @@ router.get('/api/cliente/obtener-tamanios/:nombre', async (req, res) => {
         res.status(500).json({ success: false, message: "Error en el servidor." });
     }
 });
-
 
 
 
