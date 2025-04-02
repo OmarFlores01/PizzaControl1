@@ -77,16 +77,24 @@
             "EXTRAFAMILIAR": 270
         };
         async function cargarProductos() {
-            try {
-                const response = await fetch('/api/cliente/obtener-productos');
-                const data = await response.json();
-                if (data.success) {
-                    listarProductos(data.productos);
-                }
-            } catch (error) {
-                console.error("Error al obtener productos:", error);
-            }
+    try {
+        const response = await fetch('/api/cliente/obteners-productos'); // Aquí corregimos la URL
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
+
+        const data = await response.json();
+        if (data.success) {
+            listarProductos(data.productos);
+        } else {
+            console.error("Error en la API:", data);
+        }
+    } catch (error) {
+        console.error("Error al obtener productos:", error);
+    }
+}
+
         function listarProductos(productos) {
             const tabla = document.getElementById('productos-lista');
             tabla.innerHTML = '';
