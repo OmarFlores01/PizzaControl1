@@ -3,52 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PizzaControl - Usuario</title>
-        <link rel="stylesheet" href="../assets/css/styles.css">
-
+    <title>Interfaz de Usuario</title>
+    <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="/assets/logout.css">
 </head>
 <body>
     <div class="container">
-        <h1>Menú de Pizzas</h1>
-        <table id="menu">
+        <button id="btnDescargarMenu">Descargar Menú</button>
+    </div>
+    <script>
+        document.getElementById('btnDescargarMenu').addEventListener('click', function() {
+            window.location.href = '/descargar-menu';
+        });
+    </script>
+    <a href="/views/login.html" class="logout">Cerrar sesión</a>
+    <div class="container">
+        <h1>Productos Disponibles</h1>
+        <table>
             <thead>
                 <tr>
                     <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Tamaño</th>
                     <th>Acción</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>Pizza Margarita</td>
-                    <td>Queso mozzarella y tomate</td>
-                    <td>
-                        <select>
-                            <option value="small" data-price="100">Pequeña</option>
-                            <option value="medium" data-price="150">Mediana</option>
-                            <option value="large" data-price="200">Grande</option>
-                        </select>
-                    </td>
-                    <td><button onclick="addToCart(this)">Agregar</button></td>
-                </tr>
-                <tr>
-                    <td>Pizza Pepperoni</td>
-                    <td>Queso, tomate y pepperoni</td>
-                    <td>
-                        <select>
-                            <option value="small" data-price="110">Pequeña</option>
-                            <option value="medium" data-price="160">Mediana</option>
-                            <option value="large" data-price="210">Grande</option>
-                        </select>
-                    </td>
-                    <td><button onclick="addToCart(this)">Agregar</button></td>
-                </tr>
+            <tbody id="productos-lista">
+                <!-- Productos dinámicos -->
             </tbody>
         </table>
-
-        <h2 class="cart">Carrito de Compras</h2>
-        <table id="cart">
+    </div>
+    <div class="container cart-container">
+        <h1>Carrito de Compras</h1>
+        <table>
             <thead>
                 <tr>
                     <th>Nombre</th>
@@ -56,73 +41,109 @@
                     <th>Precio</th>
                     <th>Cantidad</th>
                     <th>Total</th>
-                    <th>Eliminar</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="carrito-lista">
+                <!-- Productos en el carrito -->
             </tbody>
         </table>
-        <h3>Total a Pagar: $<span id="grandTotal">0</span></h3>
+        <button id="btn-finalizar" onclick="finalizarPedido()" disabled>Finalizar Pedido</button>
+        <button onclick="verPedido()">Ver Pedido</button>
     </div>
-    
+    <div id="modal-seleccion" class="modal">
+        <div class="modal-content">
+            <h2>Seleccione el Tamaño</h2>
+            <select id="select-tamanio">
+                <option value="CHICA">CHICA</option>
+                <option value="MEDIANA">MEDIANA</option>
+                <option value="12 REBANADAS">12 REBANADAS</option>
+                <option value="FAMILIAR">FAMILIAR</option>
+                <option value="GRANDE">GRANDE</option>
+                <option value="EXTRAFAMILIAR">EXTRAFAMILIAR</option>
+            </select>
+            <button id="btn-confirmar-tamanio">Confirmar</button>
+        </div>
+    </div>
+    <script src="../assets/js/app.js"></script>
     <script>
-        function addToCart(button) {
-            let row = button.parentElement.parentElement;
-            let name = row.cells[0].textContent;
-            let sizeSelect = row.cells[2].querySelector("select");
-            let size = sizeSelect.options[sizeSelect.selectedIndex].text;
-            let price = parseInt(sizeSelect.options[sizeSelect.selectedIndex].getAttribute("data-price"));
-            
-            let cartTable = document.getElementById("cart").getElementsByTagName("tbody")[0];
-            let existingRow = [...cartTable.rows].find(r => r.cells[0].textContent === name && r.cells[1].textContent === size);
-            
-            if (existingRow) {
-                let qtyCell = existingRow.cells[3].querySelector("input");
-                qtyCell.value = parseInt(qtyCell.value) + 1;
-                updateTotal(existingRow);
+        let carrito = [];
+        let productoSeleccionado = null;
+        const precios = {
+            "CHICA": 170,
+            "MEDIANA": 190,
+            "12 REBANADAS": 210,
+            "FAMILIAR": 230,
+            "GRANDE": 250,
+            "EXTRAFAMILIAR": 270
+        };
+        async function cargarProductos() {
+            try {
+                const response = await fetch('/api/cliente/obtener-productos');
+                const data = await response.json();
+                if (data.success) {
+                    listarProductos(data.productos);
+                }
+            } catch (error) {
+                console.error("Error al obtener productos:", error);
+            }
+        }
+        function listarProductos(productos) {
+            const tabla = document.getElementById('productos-lista');
+            tabla.innerHTML = '';
+            productos.forEach(producto => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${producto.Nombre}</td>
+                    <td><button onclick='mostrarModalTamanio("${producto.Nombre}")'>Añadir</button></td>
+                `;
+                tabla.appendChild(fila);
+            });
+        }
+        function mostrarModalTamanio(nombre) {
+            productoSeleccionado = nombre;
+            document.getElementById('modal-seleccion').style.display = 'block';
+        }
+        document.getElementById('btn-confirmar-tamanio').addEventListener('click', function() {
+            const tamanio = document.getElementById('select-tamanio').value;
+            document.getElementById('modal-seleccion').style.display = 'none';
+            agregarProductoCarrito(productoSeleccionado, tamanio);
+        });
+        function agregarProductoCarrito(nombre, tamanio) {
+            let productoEnCarrito = carrito.find(producto => producto.nombre === nombre && producto.tamanio === tamanio);
+            if (!productoEnCarrito) {
+                carrito.push({ nombre, tamanio, precio: precios[tamanio], cantidad: 1 });
             } else {
-                let newRow = cartTable.insertRow();
-                newRow.insertCell(0).textContent = name;
-                newRow.insertCell(1).textContent = size;
-                newRow.insertCell(2).textContent = `$${price}`;
-                let qtyCell = newRow.insertCell(3);
-                let qtyInput = document.createElement("input");
-                qtyInput.type = "number";
-                qtyInput.value = 1;
-                qtyInput.min = 1;
-                qtyInput.onchange = function() { updateTotal(newRow); };
-                qtyCell.appendChild(qtyInput);
-                newRow.insertCell(4).textContent = `$${price}`;
-                let deleteCell = newRow.insertCell(5);
-                let deleteBtn = document.createElement("button");
-                deleteBtn.textContent = "Eliminar";
-                deleteBtn.onclick = function() { removeFromCart(newRow); };
-                deleteCell.appendChild(deleteBtn);
-                
-                updateGrandTotal();
+                productoEnCarrito.cantidad += 1;
             }
+            actualizarTablaCarrito();
         }
-
-        function updateTotal(row) {
-            let price = parseInt(row.cells[2].textContent.replace("$", ""));
-            let qty = parseInt(row.cells[3].querySelector("input").value);
-            row.cells[4].textContent = `$${price * qty}`;
-            updateGrandTotal();
+        function actualizarTablaCarrito() {
+            const tablaCarrito = document.getElementById('carrito-lista');
+            tablaCarrito.innerHTML = '';
+            carrito.forEach((producto, index) => {
+                const totalProducto = producto.precio * producto.cantidad;
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${producto.nombre}</td>
+                    <td>${producto.tamanio}</td>
+                    <td>$${producto.precio.toFixed(2)}</td>
+                    <td><input type="number" value="${producto.cantidad}" min="1" onchange="actualizarCantidad(${index}, this.value)"></td>
+                    <td>$${totalProducto.toFixed(2)}</td>
+                    <td><button onclick="eliminarProductoCarrito(${index})">Eliminar</button></td>
+                `;
+                tablaCarrito.appendChild(fila);
+            });
         }
-
-        function removeFromCart(row) {
-            row.parentElement.removeChild(row);
-            updateGrandTotal();
+        function actualizarCantidad(index, nuevaCantidad) {
+            carrito[index].cantidad = parseInt(nuevaCantidad);
+            actualizarTablaCarrito();
         }
-
-        function updateGrandTotal() {
-            let total = 0;
-            let cartRows = document.getElementById("cart").getElementsByTagName("tbody")[0].rows;
-            for (let row of cartRows) {
-                total += parseInt(row.cells[4].textContent.replace("$", ""));
-            }
-            document.getElementById("grandTotal").textContent = total;
+        function eliminarProductoCarrito(index) {
+            carrito.splice(index, 1);
+            actualizarTablaCarrito();
         }
+        window.addEventListener('DOMContentLoaded', cargarProductos);
     </script>
 </body>
 </html>
