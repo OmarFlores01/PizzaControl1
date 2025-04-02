@@ -46,37 +46,37 @@
     <button onclick="window.location.href='/views/empleado.html'" class="btn-atras">Atrás</button>
 
     <script>
-        function cargarProductos() {
-            fetch("/api/productos/obtener-productos")
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const tabla = document.getElementById("tabla-productos");
-            tabla.innerHTML = ""; // Limpiar tabla antes de actualizar
+       function cargarProductos() {
+    fetch("/api/productos/obtener-productos")
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const tabla = document.getElementById("tablaProductos"); // ID corregido
+                tabla.innerHTML = ""; // Limpiar tabla antes de actualizar
 
-            data.productos.forEach(producto => {
-                const fila = document.createElement("tr");
-                fila.innerHTML = `
-                    <td>${producto.ID_Producto}</td>
-                    <td>${producto.Nombre}</td>
-                    <td>${producto.Tamanio || 'No especificado'}</td>
-                    <td>$${producto.Precio}</td>
-                    <td>
-                        <button onclick="editarProducto(${producto.ID_Producto})">Editar</button>
-                        <button onclick="eliminarProducto(${producto.ID_Producto})">Eliminar</button>
-                    </td>
-                `;
-                tabla.appendChild(fila);
-            });
-                    } else {
-                        alert('No se encontraron productos.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al obtener los productos:', error);
-                    alert('Hubo un error al obtener los productos.');
+                data.productos.forEach(producto => {
+                    const fila = document.createElement("tr");
+                    fila.innerHTML = `
+                        <td>${producto.ID_Producto}</td>
+                        <td>${producto.Nombre}</td>
+                        <td>${producto.Precio}</td>
+                        <td>${producto.Tamanio || 'No especificado'}</td>
+                        <td>
+                            <button onclick="editarProducto(${producto.ID_Producto})">Editar</button>
+                            <button onclick="eliminarProducto(${producto.ID_Producto})">Eliminar</button>
+                        </td>
+                    `;
+                    tabla.appendChild(fila);
                 });
-        }
+            } else {
+                alert('No se encontraron productos.');
+            }
+        })
+        .catch(error => {
+            console.error('Error al obtener los productos:', error);
+            alert('Hubo un error al obtener los productos.');
+        });
+}
 
         function editarProducto(id_producto) {
             fetch(`/api/productos/obtener-producto/${id_producto}`)
