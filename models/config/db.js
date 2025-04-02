@@ -1,6 +1,6 @@
 // db.js
 require('dotenv').config();
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 
 // Verifica si las variables de entorno existen
 console.log('DB_HOST:', process.env.DB_HOST);
