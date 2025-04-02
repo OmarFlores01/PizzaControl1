@@ -97,19 +97,20 @@
         }
 
         function listarProductos(productos) {
-            const tabla = document.getElementById('productos-lista');
-            tabla.innerHTML = '';
+    const tabla = document.getElementById('productos-lista');
+    tabla.innerHTML = '';
 
-            productos.forEach(producto => {
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-    <td>${producto.Nombre}</td>
-    <td><button onclick="cargarTamanios('${producto.Nombre}')">Añadir</button></td>
-`;
+    productos.forEach(producto => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${producto.Nombre}</td>
+            <td><button onclick="cargarTamanios('${producto.Nombre}')">Añadir</button></td>
+        `;
 
-                tabla.appendChild(fila);
-            });
-        }
+        tabla.appendChild(fila);
+    });
+}
+
 
         async function cargarTamanios(nombre) {
             try {
@@ -161,23 +162,24 @@
         }
 
         function actualizarTablaCarrito() {
-            const tablaCarrito = document.getElementById('carrito-lista');
-            tablaCarrito.innerHTML = '';
+    const tablaCarrito = document.getElementById('carrito-lista');
+    tablaCarrito.innerHTML = '';
 
-            carrito.forEach((producto, index) => {
-                const totalProducto = producto.precio * producto.cantidad;
-                const fila = document.createElement('tr');
-                fila.innerHTML = 
-                    <td>${producto.nombre}</td>
-                    <td>${producto.tamanio}</td>
-                    <td>$${producto.precio.toFixed(2)}</td>
-                    <td><input type="number" value="${producto.cantidad}" min="1" onchange="actualizarCantidad(${index}, this.value)"></td>
-                    <td>$${totalProducto.toFixed(2)}</td>
-                    <td><button onclick="eliminarProductoCarrito(${index})">Eliminar</button></td>
-                ;
-                tablaCarrito.appendChild(fila);
-            });
-        }
+    carrito.forEach((producto, index) => {
+        const totalProducto = producto.precio * producto.cantidad;
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${producto.nombre}</td>
+            <td>${producto.tamanio}</td>
+            <td>$${producto.precio.toFixed(2)}</td>
+            <td><input type="number" value="${producto.cantidad}" min="1" onchange="actualizarCantidad(${index}, this.value)"></td>
+            <td>$${totalProducto.toFixed(2)}</td>
+            <td><button onclick="eliminarProductoCarrito(${index})">Eliminar</button></td>
+        `;
+        tablaCarrito.appendChild(fila);
+    });
+}
+
         async function finalizarPedido() {
     if (carrito.length === 0) {
         alert("El carrito está vacío. Agrega productos antes de finalizar.");
