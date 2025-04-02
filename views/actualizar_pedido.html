@@ -41,6 +41,16 @@
                 <option value="Entregado">Entregado</option>
             </select>
 
+            <label>Tamaño:</label>
+            <select id="tamano" required>
+                <option value="CHICA">CHICA</option>
+                <option value="MEDIANA">MEDIANA</option>
+                <option value="12 REBANADAS">12 REBANADAS</option>
+                <option value="FAMILIAR">FAMILIAR</option>
+                <option value="GRANDE">GRANDE</option>
+                <option value="EXTRAFAMILIAR">EXTRAFAMILIAR</option>
+            </select>
+
             <label>Total ($):</label>
             <input type="number" id="total" required>
 
@@ -97,6 +107,7 @@
                     document.getElementById('descripcion').value = data.pedido.Descripcion;
                     document.getElementById('estado').value = data.pedido.Estado;
                     document.getElementById('total').value = data.pedido.Total;
+                    document.getElementById('tamano').value = data.pedido.Tamano || "CHICA"; // Valor por defecto
 
                     document.getElementById('formActualizar').style.display = 'block';
                     document.getElementById('formActualizar').setAttribute('data-id-pedido', id_pedido); // Guardar ID
@@ -117,12 +128,13 @@
             const id_pedido = document.getElementById('formActualizar').getAttribute('data-id-pedido');
             const descripcion = document.getElementById('descripcion').value;
             const estado = document.getElementById('estado').value;
+            const tamano = document.getElementById('tamano').value;
             const total = document.getElementById('total').value;
 
             fetch('/api/pedidos/actualizar-pedido', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id_pedido, descripcion, estado, total })
+                body: JSON.stringify({ id_pedido, descripcion, estado, tamano, total })
             })
             .then(response => response.json())
             .then(data => {
