@@ -124,3 +124,46 @@ button:hover {
     text-decoration: none;
     cursor: pointer;
 }
+
+.back-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #c0392b;
+}
+.btn-atras {
+    display: block;
+    width: 150px;
+    margin: 20px auto;
+    padding: 10px;
+    font-size: 16px;
+    text-align: center;
+    background-color: #ff5733;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.btn-atras:hover {
+    background-color: #e04e2a;
+}
+
+.btn-atras:hover {
+    background-color: #e04e2a;
+}
