@@ -22,11 +22,11 @@
             <!-- Aquí se llenarán los pedidos dinámicamente -->
         </tbody>
     </table>
-<button onclick="window.location.href='/views/empleado.html'" class="btn-atras">Atrás</button>
+    <button onclick="window.location.href='/views/empleado.html'" class="btn-atras">Atrás</button>
+
     <script>
         document.addEventListener("DOMContentLoaded", async function() {
-            const params = new URLSearchParams(window.location.search);
-            const id_cliente = params.get("id_cliente");
+            let id_cliente = obtenerIdCliente();
 
             if (!id_cliente) {
                 alert("Error: No se encontró el cliente.");
@@ -39,10 +39,11 @@
 
                 console.log("📦 Pedidos recibidos:", data); // Muestra en consola los pedidos
 
-                if (data.success) {
+                if (data.success && data.pedidos.length > 0) {
                     mostrarPedidosEnPantalla(data.pedidos);
                 } else {
-                    alert("No se encontraron pedidos.");
+                    document.getElementById("tabla-pedidos").innerHTML = 
+                        "<tr><td colspan='5'>No hay pedidos disponibles.</td></tr>";
                 }
             } catch (error) {
                 console.error("Error al obtener los pedidos:", error);
@@ -52,28 +53,33 @@
         function mostrarPedidosEnPantalla(pedidos) {
             const tablaPedidos = document.getElementById("tabla-pedidos");
 
-            // Verifica si el contenedor realmente existe
             if (!tablaPedidos) {
                 console.error("❌ Error: No se encontró el elemento 'tabla-pedidos'.");
                 return;
             }
 
-            // Si no hay pedidos, mostramos un mensaje
-            if (!pedidos.length) {
-                tablaPedidos.innerHTML = "<tr><td colspan='5'>No hay pedidos disponibles.</td></tr>";
-                return;
-            }
-
-            // Llena la tabla con los pedidos
             tablaPedidos.innerHTML = pedidos.map(pedido => `
                 <tr>
                     <td>${pedido.ID_Pedido}</td>
                     <td>${pedido.Descripcion}</td>
-                    <td>$${pedido.Total}</td>
+                    <td>$${pedido.Total.toFixed(2)}</td>
                     <td>${pedido.Estado}</td>
-                    <td>${new Date(pedido.Fecha).toLocaleString()}</td>
+                    <td>${new Date(pedido.Fecha).toLocaleDateString("es-MX")}</td>
                 </tr>
             `).join('');
+        }
+
+        function obtenerIdCliente() {
+            // Se intenta obtener de la URL
+            const params = new URLSearchParams(window.location.search);
+            let id_cliente = params.get("id_cliente");
+
+            // Si no está en la URL, intenta obtenerlo del almacenamiento local o sesión
+            if (!id_cliente) {
+                id_cliente = localStorage.getItem("id_cliente") || sessionStorage.getItem("id_cliente");
+            }
+
+            return id_cliente;
         }
     </script>
 </body>
