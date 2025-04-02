@@ -17,6 +17,7 @@ router.get('/obtener-tamanios/:nombre', async (req, res) => {
     const query = 'SELECT TRIM(Tamanio) AS Tamanio, Precio FROM producto WHERE LOWER(TRIM(Nombre)) = LOWER(TRIM(?))';
 
     try {
+        // Aquí aseguramos que db es un pool de conexiones con promesas
         const [rows] = await db.query(query, [nombreLimpio]);
 
         if (rows.length === 0) {
@@ -26,9 +27,10 @@ router.get('/obtener-tamanios/:nombre', async (req, res) => {
         res.json({ success: true, tamanios: rows });
     } catch (error) {
         console.error("❌ Error en la consulta:", error);
-        res.status(500).json({ success: false, message: "Error en el servidor." });
+        res.status(500).json({ success: false, message: "Error en el servidor.", error: error.message });
     }
 });
+
 
 
 
