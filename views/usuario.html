@@ -149,6 +149,39 @@
             carrito[index].cantidad = parseInt(nuevaCantidad);
             actualizarTablaCarrito();
         }
+        async function cargarTamanios(nombre) {
+    try {
+        const response = await fetch(`/api/cliente/obtener-tamanios/${nombre}`);
+
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        if (data.success) {
+            productoSeleccionado = nombre;
+            mostrarModalTamanio(data.tamanios);
+        } else {
+            console.error("Error en la API:", data);
+        }
+    } catch (error) {
+        console.error("Error al obtener tamaños:", error);
+    }
+}
+function mostrarModalTamanio(tamanios) {
+    const selectTamanio = document.getElementById('select-tamanio');
+    selectTamanio.innerHTML = ''; // Limpiar opciones previas
+
+    tamanios.forEach(tamanio => {
+        const opcion = document.createElement('option');
+        opcion.value = tamanio.Tamanio;
+        opcion.textContent = `${tamanio.Tamanio} - $${tamanio.Precio}`;
+        selectTamanio.appendChild(opcion);
+    });
+
+    document.getElementById('modal-seleccion').style.display = 'block';
+}
+
         function eliminarProductoCarrito(index) {
             carrito.splice(index, 1);
             actualizarTablaCarrito();
