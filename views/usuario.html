@@ -83,7 +83,7 @@
         async function cargarProductos() {
             try {
                 const response = await fetch('/api/cliente/obteners-productos');
-                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+                if (!response.ok) throw new Error(Error ${response.status}: ${response.statusText});
 
                 const data = await response.json();
                 if (data.success) {
@@ -102,18 +102,18 @@
 
             productos.forEach(producto => {
                 const fila = document.createElement('tr');
-                fila.innerHTML = `
+                fila.innerHTML = 
                     <td>${producto.Nombre}</td>
                     <td><button onclick='cargarTamanios("${producto.Nombre}")'>Añadir</button></td>
-                `;
+                ;
                 tabla.appendChild(fila);
             });
         }
 
         async function cargarTamanios(nombre) {
             try {
-                const response = await fetch(`/api/cliente/obtener-tamanios/${nombre}`);
-                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+                const response = await fetch(/api/cliente/obtener-tamanios/${nombre});
+                if (!response.ok) throw new Error(Error ${response.status}: ${response.statusText});
 
                 const data = await response.json();
                 if (data.success) {
@@ -134,7 +134,7 @@
             tamanios.forEach(tamanio => {
                 const opcion = document.createElement('option');
                 opcion.value = tamanio.Tamanio;
-                opcion.textContent = `${tamanio.Tamanio} - $${tamanio.Precio}`;
+                opcion.textContent = ${tamanio.Tamanio} - $${tamanio.Precio};
                 selectTamanio.appendChild(opcion);
             });
 
@@ -166,14 +166,14 @@
             carrito.forEach((producto, index) => {
                 const totalProducto = producto.precio * producto.cantidad;
                 const fila = document.createElement('tr');
-                fila.innerHTML = `
+                fila.innerHTML = 
                     <td>${producto.nombre}</td>
                     <td>${producto.tamanio}</td>
                     <td>$${producto.precio.toFixed(2)}</td>
                     <td><input type="number" value="${producto.cantidad}" min="1" onchange="actualizarCantidad(${index}, this.value)"></td>
                     <td>$${totalProducto.toFixed(2)}</td>
                     <td><button onclick="eliminarProductoCarrito(${index})">Eliminar</button></td>
-                `;
+                ;
                 tablaCarrito.appendChild(fila);
             });
         }
@@ -182,54 +182,11 @@
     carrito.splice(index, 1); // Elimina el producto del array
     actualizarTablaCarrito(); // Vuelve a renderizar la tabla para reflejar el cambio
 }
-         async function finalizarPedido() {
-    if (carrito.length === 0) {
-        alert("El carrito está vacío. Agrega productos antes de finalizar.");
-        return;
-    }
-
-    // Simulación de ID de cliente (esto debe ser dinámico, usando el ID del usuario actual)
-    const idCliente = 1; // Cambia este valor según el ID del cliente actual
-
-    // Crear la descripción y calcular el total
-    const descripcion = carrito.map(item => `${item.cantidad}x ${item.nombre} (${item.tamanio})`).join(', ');
-    const total = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
-
-    // Enviar los datos a la API
-    try {
-        const response = await fetch('/api/cliente/agregar-pedido-cliente', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                id_cliente: idCliente,
-                descripcion: descripcion,
-                total: total
-            })
-        });
-
-        const data = await response.json();
-        if (data.success) {
-            // Llenar datos en el modal
-            document.getElementById("id-pedido").textContent = data.id_pedido;
-            document.getElementById("total-pedido").textContent = total.toFixed(2);
-            document.getElementById("concepto-pedido").textContent = data.id_pedido;
-
-            // Mostrar el modal de pago
-            document.getElementById("modal-pago").style.display = "block";
-
-            // Vaciar carrito después de finalizar pedido
-            carrito = [];
-            actualizarTablaCarrito();
-        } else {
-            alert("Error al realizar el pedido: " + data.message);
+         function finalizarPedido() {
+        if (carrito.length === 0) {
+            alert("El carrito está vacío. Agrega productos antes de finalizar.");
+            return;
         }
-    } catch (error) {
-        console.error("Error al finalizar el pedido:", error);
-        alert("Hubo un problema al procesar el pedido.");
-    }
-}
 
         // Simulación de ID de pedido (puedes reemplazarlo con el ID real de la base de datos)
         const idPedido = Math.floor(Math.random() * 1000000);
@@ -275,14 +232,14 @@
         carrito.forEach((producto, index) => {
             const totalProducto = producto.precio * producto.cantidad;
             const fila = document.createElement('tr');
-            fila.innerHTML = `
+            fila.innerHTML = 
                 <td>${producto.nombre}</td>
                 <td>${producto.tamanio}</td>
                 <td>$${producto.precio.toFixed(2)}</td>
                 <td><input type="number" value="${producto.cantidad}" min="1" onchange="actualizarCantidad(${index}, this.value)"></td>
                 <td>$${totalProducto.toFixed(2)}</td>
                 <td><button onclick="eliminarProductoCarrito(${index})">Eliminar</button></td>
-            `;
+            ;
             tablaCarrito.appendChild(fila);
         });
     }
