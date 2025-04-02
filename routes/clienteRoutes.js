@@ -2,20 +2,23 @@ const express = require('express');
 const router = express.Router();
 const db = require('../models/config/db'); // Verifica que esté bien configurado
 
-
+// Obtener tamaños y precios de una pizza por nombre
 router.get('/obtener-tamanios/:nombre', async (req, res) => {
-    const nombre = req.params.nombre;
     try {
-        const query = 'SELECT Tamanio, Precio FROM producto WHERE Nombre = ?';
+        const nombre = req.params.nombre.trim(); // Elimina espacios innecesarios
+        const query = 'SELECT TRIM(Tamanio) AS Tamanio, Precio FROM producto WHERE TRIM(Nombre) = ?';
         const [tamanios] = await db.query(query, [nombre]);
+
+        if (tamanios.length === 0) {
+            return res.status(404).json({ success: false, message: "No se encontraron tamaños para este producto" });
+        }
 
         res.json({ success: true, tamanios });
     } catch (error) {
-        console.error("Error al obtener tamaños:", error);
-        res.status(500).json({ success: false, message: "Error en el servidor" });
+        console.error("❌ Error al obtener tamaños:", error);
+        res.status(500).json({ success: false, message: "Error en el servidor", error: error.message });
     }
 });
-
 
 // Agregar un pedido
 router.post('/agregar-pedido-cliente', (req, res) => {
@@ -77,24 +80,19 @@ router.get('/obtener-pedidos-cliente/:id_cliente', (req, res) => {
     });
 });
 
-// Obtener productos
+// Obtener productos (Corrección del nombre de la ruta)
 router.get('/obteners-productos', (req, res) => {
     const query = 'SELECT DISTINCT Nombre FROM producto';
     
     db.query(query, (err, productos) => {
         if (err) {
-            console.error("Error al obtener productos:", err);
+            console.error("❌ Error al obtener productos:", err);
             return res.status(500).json({ success: false, message: "Error en el servidor", error: err.message });
         }
 
         res.json({ success: true, productos });
     });
 });
-
-
-
-
-
 
 // Finalizar un pedido
 router.post('/finalizar', (req, res) => {
