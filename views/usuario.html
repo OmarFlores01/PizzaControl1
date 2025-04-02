@@ -102,10 +102,11 @@
 
             productos.forEach(producto => {
                 const fila = document.createElement('tr');
-                fila.innerHTML = 
-                    <td>${producto.Nombre}</td>
-                    <td><button onclick='cargarTamanios("${producto.Nombre}")'>Añadir</button></td>
-                ;
+                fila.innerHTML = `
+    <td>${producto.Nombre}</td>
+    <td><button onclick="cargarTamanios('${producto.Nombre}')">Añadir</button></td>
+`;
+
                 tabla.appendChild(fila);
             });
         }
