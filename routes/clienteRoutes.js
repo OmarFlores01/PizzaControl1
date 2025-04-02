@@ -55,12 +55,12 @@ router.post('/agregar-pedido-cliente', (req, res) => {
 
 // Obtener todos los pedidos con información del cliente
 router.get('/obtener-pedidos', (req, res) => {
-    const query = `
+    const query = 
         SELECT p.ID_Pedido, c.Nombre AS Cliente, p.Total, p.Estado
         FROM pedidos p
         LEFT JOIN clientes c ON p.ID_Cliente = c.ID_Cliente
         ORDER BY p.Fecha DESC;
-    `;
+    ;
 
     db.query(query, (err, result) => {
         if (err) {
@@ -76,12 +76,12 @@ router.get('/obtener-pedidos', (req, res) => {
 router.get('/obtener-pedidos-cliente/:id_cliente', (req, res) => {
     const id_cliente = req.params.id_cliente;
 
-    const query = `
+    const query = 
         SELECT ID_Pedido, Descripcion, Estado, Fecha, Total 
         FROM pedidos 
         WHERE ID_Cliente = ? 
         ORDER BY Fecha DESC;
-    `;
+    ;
 
     db.query(query, [id_cliente], (err, result) => {
         if (err) {
@@ -115,7 +115,7 @@ router.post('/finalizar', (req, res) => {
         return res.status(400).json({ success: false, message: 'Faltan datos del pedido' });
     }
 
-    const descripcion = productos.map(p => `${p.cantidad}x ${p.nombre || 'Producto desconocido'}`).join(', ');
+    const descripcion = productos.map(p => ${p.cantidad}x ${p.nombre || 'Producto desconocido'}).join(', ');
     const total = productos.reduce((sum, p) => sum + (p.precio * p.cantidad || 0), 0);
 
     if (isNaN(total) || total <= 0) {
