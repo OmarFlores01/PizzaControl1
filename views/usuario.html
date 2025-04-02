@@ -53,7 +53,7 @@
             </tbody>
         </table>
         <button id="btn-finalizar" onclick="finalizarPedido()" disabled>Finalizar Pedido</button>
-                <button><a href="pedidos.html">Ver Pedidos</a></button>
+                <button id="btn-finalizar"><a href="pedidos.html">Ver Pedidos</a></button>
     </div>
 
     <!-- Modal para seleccionar el tamaño -->
@@ -233,17 +233,19 @@
         console.error('Error al finalizar pedido:', error);
     }
 }
+
 function cerrarModalPago() {
         document.getElementById('modal-pago').style.display = 'none';
     }
        function mostrarModalPago(idPedido, total) {
-        console.log(idPedido); // Verificar que el ID se pasa correctamente
-        document.getElementById('id-pedido').textContent = idPedido;
-        document.getElementById('total-pedido').textContent = total.toFixed(2);
-        document.getElementById('concepto-pedido').textContent = idPedido;
+    console.log(idPedido); // Verificar que el ID se pasa correctamente
+    document.getElementById('id-pedido').textContent = idPedido; // Asegúrate de que se esté asignando el ID correctamente
+    document.getElementById('total-pedido').textContent = total.toFixed(2);
+    document.getElementById('concepto-pedido').textContent = `Pedido-${idPedido}`;
 
-        document.getElementById('modal-pago').style.display = 'block';
-    }
+    // Mostrar el modal después de asignar los valores
+    document.getElementById('modal-pago').style.display = 'block';
+}
 
         
 
