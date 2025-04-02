@@ -37,8 +37,17 @@
             <input type="text" id="nombre_producto" required>
             <label>Precio:</label>
             <input type="number" id="precio" step="0.01" required>
-            <label>Tamaño:</label>
-            <input type="text" id="tamano" required>
+<label>Tamaño:</label>
+<select id="tamanio">
+    <option value="">-- Selecciona el Tamaño --</option>
+    <option value="CHICA">CHICA</option>
+    <option value="MEDIANA">MEDIANA</option>
+    <option value="12 REBANADAS">12 REBANADAS</option>
+    <option value="FAMILIAR">FAMILIAR</option>
+    <option value="GRANDE">GRANDE</option>
+    <option value="EXTRAFAMILIAR">EXTRAFAMILIAR</option>
+</select>
+
             <button type="submit">Actualizar Producto</button>
         </form>
     </div>
@@ -77,55 +86,56 @@
         });
 }
 
-        function editarProducto(id_producto) {
-            fetch(`/api/productos/obtener-producto/${id_producto}`)
-            .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('id_producto').value = data.producto.ID_Producto;
-                        document.getElementById('nombre_producto').value = data.producto.Nombre;
-                        document.getElementById('precio').value = data.producto.Precio;
-                        document.getElementById('tamano').value = data.producto.Tamano;
+       function editarProducto(id_producto) {
+    fetch(`/api/productos/obtener-producto/${id_producto}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('id_producto').value = data.producto.ID_Producto;
+            document.getElementById('nombre_producto').value = data.producto.Nombre;
+            document.getElementById('precio').value = data.producto.Precio;
+            document.getElementById('tamanio').value = data.producto.Tamanio || "";  // Ahora toma la propiedad correctamente
 
-                        document.getElementById('formActualizar').classList.remove('hidden');
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Hubo un error al obtener el producto.');
-                });
+            document.getElementById('formActualizar').classList.remove('hidden');
+        } else {
+            alert('Error: ' + data.message);
         }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Hubo un error al obtener el producto.');
+    });
+}
 
-        document.getElementById('formActualizar').addEventListener('submit', function(event) {
-            event.preventDefault();
+document.getElementById('formActualizar').addEventListener('submit', function(event) {
+    event.preventDefault();
 
-            const id_producto = document.getElementById('id_producto').value;
-            const nombre_producto = document.getElementById('nombre_producto').value;
-            const precio = document.getElementById('precio').value;
-            const tamano = document.getElementById('tamano').value;
+    const id_producto = document.getElementById('id_producto').value;
+    const nombre_producto = document.getElementById('nombre_producto').value;
+    const precio = document.getElementById('precio').value;
+    const tamanio = document.getElementById('tamanio').value;  // Ahora el ID es correcto
 
-            fetch('/api/productos/actualizar-producto', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id_producto, nombre_producto, precio, tamano })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Producto actualizado correctamente');
-                    document.getElementById('formActualizar').classList.add('hidden');
-                    cargarProductos(); 
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Hubo un error al actualizar el producto.');
-            });
-        });
+    fetch('/api/productos/actualizar-producto', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_producto, nombre_producto, precio, tamanio })  // Enviar "tamanio" correctamente
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Producto actualizado correctamente');
+            document.getElementById('formActualizar').classList.add('hidden');
+            cargarProductos(); 
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Hubo un error al actualizar el producto.');
+    });
+});
+
 
         window.onload = cargarProductos;
     </script>
