@@ -67,16 +67,16 @@
 
     <!-- Modal de pago -->
     <div id="modal-pago" class="modal">
-        <div class="modal-content">
-            <h2>Detalles de Pago</h2>
-            <p><strong>ID del pedido:</strong> <span id="id-pedido"></span></p>
-            <p><strong>Cuenta de transferencia:</strong> 876543234567876</p>
-            <p><strong>Total:</strong> $<span id="total-pedido"></span></p>
-            <p><strong>Enviar captura de la transferencia al número:</strong> 5565544395</p>
-            <p><strong>Concepto:</strong> Pedido-<span id="concepto-pedido"></span></p>
-            <button onclick="cerrarModalPago()">Cerrar</button>
-        </div>
+    <div class="modal-content">
+        <h2>Detalles de Pago</h2>
+        <p><strong>ID del pedido:</strong> <span id="id-pedido"></span></p>
+        <p><strong>Cuenta de transferencia:</strong> 876543234567876</p>
+        <p><strong>Total:</strong> $<span id="total-pedido"></span></p>
+        <p><strong>Enviar captura de la transferencia al número:</strong> 5565544395</p>
+        <p><strong>Concepto:</strong> Pedido-<span id="concepto-pedido"></span></p>
+        <button onclick="cerrarModalPago()">Cerrar</button>
     </div>
+</div>
 
     <script>
         let carrito = [];
@@ -233,15 +233,19 @@
         console.error('Error al finalizar pedido:', error);
     }
 }
+function cerrarModalPago() {
+        document.getElementById('modal-pago').style.display = 'none';
+    }
+       function mostrarModalPago(idPedido, total) {
+        console.log(idPedido); // Verificar que el ID se pasa correctamente
+        document.getElementById('id-pedido').textContent = idPedido;
+        document.getElementById('total-pedido').textContent = total.toFixed(2);
+        document.getElementById('concepto-pedido').textContent = idPedido;
 
-        function mostrarModalPago(idPedido, total) {
-    console.log(idPedido); // Agregar un log aquí también para verificar si 'idPedido' se pasa correctamente
-    document.getElementById('id-pedido').textContent = idPedido;
-    document.getElementById('total-pedido').textContent = total.toFixed(2);
-    document.getElementById('concepto-pedido').textContent = idPedido;
+        document.getElementById('modal-pago').style.display = 'block';
+    }
 
-    document.getElementById('modal-pago').style.display = 'block';
-}
+        
 
         // Iniciar carga de productos al cargar la página
         cargarProductos();
