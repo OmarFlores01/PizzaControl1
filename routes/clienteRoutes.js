@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../models/config/db'); // Verifica que esté bien configurado
 
 // Obtener tamaños y precios de una pizza por nombre
-app.get('/api/cliente/obtener-tamanios/:nombre', async (req, res) => {
+router.get('/api/cliente/obtener-tamanios/:nombre', async (req, res) => {
     const nombre = req.params.nombre; // 👈 Aquí tomamos el parámetro de la URL
     console.log("🔎 Nombre recibido:", nombre);
     
