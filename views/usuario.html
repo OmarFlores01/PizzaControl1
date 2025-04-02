@@ -11,12 +11,15 @@
     <div class="container">
         <button id="btnDescargarMenu">Descargar Menú</button>
     </div>
+
     <script>
         document.getElementById('btnDescargarMenu').addEventListener('click', function() {
             window.location.href = '/descargar-menu';
         });
     </script>
+
     <a href="/views/login.html" class="logout">Cerrar sesión</a>
+
     <div class="container">
         <h1>Productos Disponibles</h1>
         <table>
@@ -31,6 +34,7 @@
             </tbody>
         </table>
     </div>
+
     <div class="container cart-container">
         <h1>Carrito de Compras</h1>
         <table>
@@ -49,88 +53,103 @@
             </tbody>
         </table>
         <button id="btn-finalizar" onclick="finalizarPedido()" disabled>Finalizar Pedido</button>
-        <button onclick="verPedido()">Ver Pedido</button>
     </div>
+
     <div id="modal-seleccion" class="modal">
         <div class="modal-content">
             <h2>Seleccione el Tamaño</h2>
-            <select id="select-tamanio">
-                <option value="CHICA">CHICA</option>
-                <option value="MEDIANA">MEDIANA</option>
-                <option value="12 REBANADAS">12 REBANADAS</option>
-                <option value="FAMILIAR">FAMILIAR</option>
-                <option value="GRANDE">GRANDE</option>
-                <option value="EXTRAFAMILIAR">EXTRAFAMILIAR</option>
-            </select>
+            <select id="select-tamanio"></select>
             <button id="btn-confirmar-tamanio">Confirmar</button>
         </div>
     </div>
+
     <script>
         let carrito = [];
         let productoSeleccionado = null;
-        const precios = {
-            "CHICA": 170,
-            "MEDIANA": 190,
-            "12 REBANADAS": 210,
-            "FAMILIAR": 230,
-            "GRANDE": 250,
-            "EXTRAFAMILIAR": 270
-        };
+
         async function cargarProductos() {
-    try {
-        const response = await fetch('/api/cliente/obteners-productos');
+            try {
+                const response = await fetch('/api/cliente/obteners-productos');
+                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
 
-        if (!response.ok) {
-            throw new Error(`Error ${response.status}: ${response.statusText}`);
+                const data = await response.json();
+                if (data.success) {
+                    listarProductos(data.productos);
+                } else {
+                    console.error("Error en la API:", data);
+                }
+            } catch (error) {
+                console.error("Error al obtener productos:", error);
+            }
         }
-
-        const data = await response.json();
-        if (data.success) {
-            listarProductos(data.productos);
-        } else {
-            console.error("Error en la API:", data);
-        }
-    } catch (error) {
-        console.error("Error al obtener productos:", error);
-    }
-}
-
 
         function listarProductos(productos) {
-    const tabla = document.getElementById('productos-lista');
-    tabla.innerHTML = '';
+            const tabla = document.getElementById('productos-lista');
+            tabla.innerHTML = '';
 
-    productos.forEach(producto => {
-        const fila = document.createElement('tr');
-        fila.innerHTML = `
-            <td>${producto.Nombre}</td>
-            <td><button onclick='cargarTamanios("${producto.Nombre}")'>Añadir</button></td>
-        `;
-        tabla.appendChild(fila);
-    });
-}
+            productos.forEach(producto => {
+                const fila = document.createElement('tr');
+                fila.innerHTML = `
+                    <td>${producto.Nombre}</td>
+                    <td><button onclick='cargarTamanios("${producto.Nombre}")'>Añadir</button></td>
+                `;
+                tabla.appendChild(fila);
+            });
+        }
 
-        function mostrarModalTamanio(nombre) {
-            productoSeleccionado = nombre;
+        async function cargarTamanios(nombre) {
+            try {
+                const response = await fetch(`/api/cliente/obtener-tamanios/${nombre}`);
+                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
+                const data = await response.json();
+                if (data.success) {
+                    productoSeleccionado = nombre;
+                    mostrarModalTamanio(data.tamanios);
+                } else {
+                    console.error("Error en la API:", data);
+                }
+            } catch (error) {
+                console.error("Error al obtener tamaños:", error);
+            }
+        }
+
+        function mostrarModalTamanio(tamanios) {
+            const selectTamanio = document.getElementById('select-tamanio');
+            selectTamanio.innerHTML = '';
+
+            tamanios.forEach(tamanio => {
+                const opcion = document.createElement('option');
+                opcion.value = tamanio.Tamanio;
+                opcion.textContent = `${tamanio.Tamanio} - $${tamanio.Precio}`;
+                selectTamanio.appendChild(opcion);
+            });
+
             document.getElementById('modal-seleccion').style.display = 'block';
         }
+
         document.getElementById('btn-confirmar-tamanio').addEventListener('click', function() {
             const tamanio = document.getElementById('select-tamanio').value;
+            const precio = document.getElementById('select-tamanio').selectedOptions[0].text.split(' - $')[1];
+
             document.getElementById('modal-seleccion').style.display = 'none';
-            agregarProductoCarrito(productoSeleccionado, tamanio);
+            agregarProductoCarrito(productoSeleccionado, tamanio, parseFloat(precio));
         });
-        function agregarProductoCarrito(nombre, tamanio) {
+
+        function agregarProductoCarrito(nombre, tamanio, precio) {
             let productoEnCarrito = carrito.find(producto => producto.nombre === nombre && producto.tamanio === tamanio);
             if (!productoEnCarrito) {
-                carrito.push({ nombre, tamanio, precio: precios[tamanio], cantidad: 1 });
+                carrito.push({ nombre, tamanio, precio, cantidad: 1 });
             } else {
                 productoEnCarrito.cantidad += 1;
             }
             actualizarTablaCarrito();
         }
+
         function actualizarTablaCarrito() {
             const tablaCarrito = document.getElementById('carrito-lista');
             tablaCarrito.innerHTML = '';
+
             carrito.forEach((producto, index) => {
                 const totalProducto = producto.precio * producto.cantidad;
                 const fila = document.createElement('tr');
@@ -145,47 +164,7 @@
                 tablaCarrito.appendChild(fila);
             });
         }
-        function actualizarCantidad(index, nuevaCantidad) {
-            carrito[index].cantidad = parseInt(nuevaCantidad);
-            actualizarTablaCarrito();
-        }
-        async function cargarTamanios(nombre) {
-    try {
-        const response = await fetch(`/api/cliente/obtener-tamanios/${nombre}`);
 
-        if (!response.ok) {
-            throw new Error(`Error ${response.status}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        if (data.success) {
-            productoSeleccionado = nombre;
-            mostrarModalTamanio(data.tamanios);
-        } else {
-            console.error("Error en la API:", data);
-        }
-    } catch (error) {
-        console.error("Error al obtener tamaños:", error);
-    }
-}
-function mostrarModalTamanio(tamanios) {
-    const selectTamanio = document.getElementById('select-tamanio');
-    selectTamanio.innerHTML = ''; // Limpiar opciones previas
-
-    tamanios.forEach(tamanio => {
-        const opcion = document.createElement('option');
-        opcion.value = tamanio.Tamanio;
-        opcion.textContent = `${tamanio.Tamanio} - $${tamanio.Precio}`;
-        selectTamanio.appendChild(opcion);
-    });
-
-    document.getElementById('modal-seleccion').style.display = 'block';
-}
-
-        function eliminarProductoCarrito(index) {
-            carrito.splice(index, 1);
-            actualizarTablaCarrito();
-        }
         window.addEventListener('DOMContentLoaded', cargarProductos);
     </script>
 </body>
