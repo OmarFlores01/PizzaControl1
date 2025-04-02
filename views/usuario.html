@@ -83,7 +83,7 @@
         async function cargarProductos() {
             try {
                 const response = await fetch('/api/cliente/obteners-productos');
-                if (!response.ok) throw new Error(Error ${response.status}: ${response.statusText});
+if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
 
                 const data = await response.json();
                 if (data.success) {
@@ -115,7 +115,7 @@
         async function cargarTamanios(nombre) {
             try {
                 const response = await fetch(/api/cliente/obtener-tamanios/${nombre});
-                if (!response.ok) throw new Error(Error ${response.status}: ${response.statusText});
+if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
 
                 const data = await response.json();
                 if (data.success) {
