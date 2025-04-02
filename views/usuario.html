@@ -62,6 +62,19 @@
             <button id="btn-confirmar-tamanio">Confirmar</button>
         </div>
     </div>
+    <!-- Modal de Detalles de Pago -->
+<div id="modal-pago" class="modal">
+    <div class="modal-content">
+        <h2>Detalles de Pago</h2>
+        <p><strong>ID del pedido:</strong> <span id="id-pedido"></span></p>
+        <p><strong>Cuenta de transferencia:</strong> 876543234567876</p>
+        <p><strong>Total:</strong> $<span id="total-pedido"></span></p>
+        <p><strong>Enviar captura de la transferencia al número:</strong> 5565544395</p>
+        <p><strong>Concepto:</strong> Pedido-<span id="concepto-pedido"></span></p>
+        <button onclick="cerrarModalPago()">Cerrar</button>
+        <button><a href="pedidos.html">Ver Pedidos</a></button>
+    </div>
+</div>
 
     <script>
         let carrito = [];
@@ -169,6 +182,32 @@
     carrito.splice(index, 1); // Elimina el producto del array
     actualizarTablaCarrito(); // Vuelve a renderizar la tabla para reflejar el cambio
 }
+         function finalizarPedido() {
+        if (carrito.length === 0) {
+            alert("El carrito está vacío. Agrega productos antes de finalizar.");
+            return;
+        }
+
+        // Simulación de ID de pedido (puedes reemplazarlo con el ID real de la base de datos)
+        const idPedido = Math.floor(Math.random() * 1000000);
+        const total = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+
+        // Llenar datos en el modal
+        document.getElementById("id-pedido").textContent = idPedido;
+        document.getElementById("total-pedido").textContent = total.toFixed(2);
+        document.getElementById("concepto-pedido").textContent = idPedido;
+
+        // Mostrar el modal
+        document.getElementById("modal-pago").style.display = "block";
+
+        // Vaciar carrito después de finalizar pedido
+        carrito = [];
+        actualizarTablaCarrito();
+    }
+
+    function cerrarModalPago() {
+        document.getElementById("modal-pago").style.display = "none";
+    }
 
 
         window.addEventListener('DOMContentLoaded', cargarProductos);
