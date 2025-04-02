@@ -1,8 +1,6 @@
-//Agregar producto-------------------------------------------------------------------
 const express = require('express');
 const router = express.Router();
-const db = require('../models/config/db'); // Asegúrate de importar la conexión a la BD
-
+const db = require('../models/config/db'); 
 
 // Agregar producto
 router.post('/agregar-producto', (req, res) => {
@@ -22,11 +20,9 @@ router.post('/agregar-producto', (req, res) => {
     });
 });
 
-
-
-// Obtener todos los productos
+// Obtener todos los productos (Ahora incluye Tamanio)
 router.get('/obtener-productos', (req, res) => {
-    const query = 'SELECT ID_Producto, Nombre, Precio FROM producto'; // No incluir Tamanio ni Precio aquí
+    const query = 'SELECT ID_Producto, Nombre, Tamanio, Precio FROM producto';
     db.query(query, (err, results) => {
         if (err) {
             console.error('Error al obtener productos:', err);
@@ -35,22 +31,11 @@ router.get('/obtener-productos', (req, res) => {
         res.json({ success: true, productos: results });
     });
 });
-router.get('/obteners-productos', (req, res) => {
-    const query = 'SELECT ID_Producto, Nombre FROM producto'; // No incluir Tamanio ni Precio aquí
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error('Error al obtener productos:', err);
-            return res.status(500).json({ success: false, message: 'Error al obtener productos' });
-        }
-        res.json({ success: true, productos: results });
-    });
-});
-
 
 // Obtener un producto por ID
 router.get('/obtener-producto/:id', (req, res) => {
     const id = req.params.id;
-    db.query('SELECT * FROM producto WHERE ID_Producto = ?', [id], (err, result) => { // Cambiado 'productos' a 'producto'
+    db.query('SELECT * FROM producto WHERE ID_Producto = ?', [id], (err, result) => {
         if (err || result.length === 0) {
             return res.status(404).json({ success: false, message: 'Producto no encontrado' });
         }
@@ -60,11 +45,15 @@ router.get('/obtener-producto/:id', (req, res) => {
 
 // Actualizar producto
 router.put('/actualizar-producto', (req, res) => {
-    const { id_producto, nombre_producto, precio } = req.body;
+    const { id_producto, nombre_producto, tamanio, precio } = req.body;
 
-    db.query('UPDATE producto SET Nombre = ?, Precio = ? WHERE ID_Producto = ?', 
-    [nombre_producto, precio, id_producto], 
-    (err, result) => { // Cambiado 'productos' a 'producto'
+    if (!id_producto || !nombre_producto || !tamanio || isNaN(precio) || precio <= 0) {
+        return res.status(400).json({ success: false, message: "Datos inválidos" });
+    }
+
+    db.query('UPDATE producto SET Nombre = ?, Tamanio = ?, Precio = ? WHERE ID_Producto = ?', 
+    [nombre_producto, tamanio, precio, id_producto], 
+    (err, result) => {
         if (err) {
             console.error('Error al actualizar producto:', err);
             return res.status(500).json({ success: false, message: 'Error al actualizar producto' });
@@ -73,7 +62,7 @@ router.put('/actualizar-producto', (req, res) => {
     });
 });
 
-// Eliminar un producto por ID
+// Eliminar producto
 router.delete('/eliminar-producto/:id', (req, res) => {
     const id = req.params.id;
 
