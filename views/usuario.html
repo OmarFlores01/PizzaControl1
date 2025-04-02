@@ -78,7 +78,7 @@
         };
         async function cargarProductos() {
     try {
-        const response = await fetch('/api/cliente/obteners-productos'); // Aquí corregimos la URL
+        const response = await fetch('/api/cliente/obteners-productos');
 
         if (!response.ok) {
             throw new Error(`Error ${response.status}: ${response.statusText}`);
@@ -95,18 +95,21 @@
     }
 }
 
+
         function listarProductos(productos) {
-            const tabla = document.getElementById('productos-lista');
-            tabla.innerHTML = '';
-            productos.forEach(producto => {
-                const fila = document.createElement('tr');
-                fila.innerHTML = `
-                    <td>${producto.Nombre}</td>
-                    <td><button onclick='mostrarModalTamanio("${producto.Nombre}")'>Añadir</button></td>
-                `;
-                tabla.appendChild(fila);
-            });
-        }
+    const tabla = document.getElementById('productos-lista');
+    tabla.innerHTML = '';
+
+    productos.forEach(producto => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td>${producto.Nombre}</td>
+            <td><button onclick='cargarTamanios("${producto.Nombre}")'>Añadir</button></td>
+        `;
+        tabla.appendChild(fila);
+    });
+}
+
         function mostrarModalTamanio(nombre) {
             productoSeleccionado = nombre;
             document.getElementById('modal-seleccion').style.display = 'block';
