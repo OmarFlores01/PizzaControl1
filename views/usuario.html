@@ -79,178 +79,117 @@
 </div>
 
         <script>
-        let carrito = [];
-        let productoSeleccionado = null;
+       let carrito = [];
 
-        async function cargarProductos() {
-            try {
-                const response = await fetch('/api/cliente/obteners-productos');
-                if (!response.ok) throw new Error(Error ${response.status}: ${response.statusText});
-
-                const data = await response.json();
-                if (data.success) {
-                    listarProductos(data.productos);
-                } else {
-                    console.error("Error en la API:", data);
-                }
-            } catch (error) {
-                console.error("Error al obtener productos:", error);
-            }
-        }
-
-        function listarProductos(productos) {
-            const tabla = document.getElementById('productos-lista');
-            tabla.innerHTML = '';
-
-            productos.forEach(producto => {
-                const fila = document.createElement('tr');
-                fila.innerHTML = 
-                    <td>${producto.Nombre}</td>
-                    <td><button onclick="cargarTamanios('${producto.Nombre}')">Añadir</button></td>
-                ;
-                tabla.appendChild(fila);
-            });
-        }
-
-        async function cargarTamanios(nombre) {
-            try {
-                const response = await fetch(/api/cliente/obtener-tamanios/${nombre});
-                if (!response.ok) throw new Error(Error ${response.status}: ${response.statusText});
-
-                const data = await response.json();
-                if (data.success) {
-                    productoSeleccionado = nombre;
-                    mostrarModalTamanio(data.tamanios);
-                } else {
-                    console.error("Error en la API:", data);
-                }
-            } catch (error) {
-                console.error("Error al obtener tamaños:", error);
-            }
-        }
-
-        function mostrarModalTamanio(tamanios) {
-            const selectTamanio = document.getElementById('select-tamanio');
-            selectTamanio.innerHTML = '';
-
-            tamanios.forEach(tamanio => {
-                const opcion = document.createElement('option');
-                opcion.value = tamanio.Tamanio;
-                opcion.textContent = ${tamanio.Tamanio} - $${tamanio.Precio};
-                selectTamanio.appendChild(opcion);
-            });
-
-            document.getElementById('modal-seleccion').style.display = 'block';
-        }
-
-        document.getElementById('btn-confirmar-tamanio').addEventListener('click', function() {
-            const tamanio = document.getElementById('select-tamanio').value;
-            const precio = document.getElementById('select-tamanio').selectedOptions[0].text.split(' - $')[1];
-
-            document.getElementById('modal-seleccion').style.display = 'none';
-            agregarProductoCarrito(productoSeleccionado, tamanio, parseFloat(precio));
-        });
-
-        function agregarProductoCarrito(nombre, tamanio, precio) {
-            let productoEnCarrito = carrito.find(producto => producto.nombre === nombre && producto.tamanio === tamanio);
-            if (!productoEnCarrito) {
-                carrito.push({ nombre, tamanio, precio, cantidad: 1 });
-            } else {
-                productoEnCarrito.cantidad += 1;
-            }
-            actualizarTablaCarrito();
-        }
-
-        function actualizarTablaCarrito() {
-            const tablaCarrito = document.getElementById('carrito-lista');
-            tablaCarrito.innerHTML = '';
-
-            carrito.forEach((producto, index) => {
-                const totalProducto = producto.precio * producto.cantidad;
-                const fila = document.createElement('tr');
-                fila.innerHTML = 
-                    <td>${producto.nombre}</td>
-                    <td>${producto.tamanio}</td>
-                    <td>$${producto.precio.toFixed(2)}</td>
-                    <td><input type="number" value="${producto.cantidad}" min="1" onchange="actualizarCantidad(${index}, this.value)"></td>
-                    <td>$${totalProducto.toFixed(2)}</td>
-                    <td><button onclick="eliminarProductoCarrito(${index})">Eliminar</button></td>
-                ;
-                tablaCarrito.appendChild(fila);
-            });
-
-            // Habilitar el botón de finalizar si hay productos en el carrito
-            document.getElementById('btn-finalizar').disabled = carrito.length === 0;
-        }
-
-        function actualizarCantidad(index, nuevaCantidad) {
-            nuevaCantidad = parseInt(nuevaCantidad, 10);
-            if (nuevaCantidad > 0) {
-                carrito[index].cantidad = nuevaCantidad;
-                actualizarTablaCarrito();
-            } else {
-                alert("La cantidad debe ser mayor que 0");
-            }
-        }
-
-        async function finalizarPedido() {
-    if (carrito.length === 0) {
-        alert("El carrito está vacío. Agrega productos antes de finalizar.");
-        return;
-    }
-
-    const estado = "En preparación";
-    const idCliente = 1; // Cambia este valor según el ID del cliente actual
-    const descripcion = carrito.map(item => ${item.cantidad}x ${item.nombre} (${item.tamanio})).join(', ');
-    const total = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
-
+async function cargarProductos() {
     try {
-        const response = await fetch('/api/cliente/agregar-pedido-cliente', {
+        const response = await fetch('/api/cliente/obtener-productos');
+        if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+        const productos = await response.json();
+        listarProductos(productos);
+    } catch (error) {
+        console.error('Error al cargar productos:', error);
+    }
+}
+
+function listarProductos(productos) {
+    const tabla = document.getElementById('tabla-productos').getElementsByTagName('tbody')[0];
+    tabla.innerHTML = '';
+    
+    productos.forEach(producto => {
+        let fila = tabla.insertRow();
+        fila.innerHTML = `
+            <td>${producto.Nombre}</td>
+            <td><button onclick="cargarTamanios('${producto.Nombre}')">Añadir</button></td>
+        `;
+    });
+}
+
+async function cargarTamanios(nombre) {
+    try {
+        const response = await fetch(`/api/cliente/obtener-tamanios/${nombre}`);
+        if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+        const tamanios = await response.json();
+        mostrarModalTamanio(nombre, tamanios);
+    } catch (error) {
+        console.error('Error al cargar tamaños:', error);
+    }
+}
+
+function mostrarModalTamanio(nombre, tamanios) {
+    const select = document.getElementById('select-tamanios');
+    select.innerHTML = '';
+    
+    tamanios.forEach(tamanio => {
+        let opcion = document.createElement('option');
+        opcion.value = tamanio.Tamanio;
+        opcion.textContent = `${tamanio.Tamanio} - $${tamanio.Precio}`;
+        select.appendChild(opcion);
+    });
+    
+    document.getElementById('modal-tamanio').style.display = 'block';
+}
+
+function agregarAlCarrito() {
+    const nombre = document.getElementById('producto-seleccionado').value;
+    const select = document.getElementById('select-tamanios');
+    const tamanio = select.value;
+    const precio = parseFloat(select.options[select.selectedIndex].text.split('$')[1]);
+    
+    carrito.push({ nombre, tamanio, precio, cantidad: 1 });
+    actualizarTablaCarrito();
+}
+
+function actualizarTablaCarrito() {
+    const tabla = document.getElementById('tabla-carrito').getElementsByTagName('tbody')[0];
+    tabla.innerHTML = '';
+    
+    carrito.forEach((producto, index) => {
+        let totalProducto = producto.precio * producto.cantidad;
+        let fila = tabla.insertRow();
+        fila.innerHTML = `
+            <td>${producto.nombre}</td>
+            <td>${producto.tamanio}</td>
+            <td>$${producto.precio.toFixed(2)}</td>
+            <td><input type="number" value="${producto.cantidad}" min="1" onchange="actualizarCantidad(${index}, this.value)"></td>
+            <td>$${totalProducto.toFixed(2)}</td>
+            <td><button onclick="eliminarProductoCarrito(${index})">Eliminar</button></td>
+        `;
+    });
+}
+
+function actualizarCantidad(index, cantidad) {
+    carrito[index].cantidad = parseInt(cantidad);
+    actualizarTablaCarrito();
+}
+
+function eliminarProductoCarrito(index) {
+    carrito.splice(index, 1);
+    actualizarTablaCarrito();
+}
+
+async function finalizarPedido() {
+    try {
+        const descripcion = carrito.map(item => `${item.cantidad}x ${item.nombre} (${item.tamanio})`).join(', ');
+        const response = await fetch('/api/cliente/realizar-pedido', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id_cliente: idCliente,
-                descripcion: descripcion,
-                total: total,
-                estado: estado
-            })
+            body: JSON.stringify({ descripcion })
         });
-
-        if (!response.ok) throw new Error(Error ${response.status}: ${response.statusText});
-
-        const data = await response.json();
-        console.log(data); // Aquí para depurar la respuesta de la API
-
-        if (data.success) {
-            alert('Pedido finalizado con éxito.');
-            carrito = [];
-            actualizarTablaCarrito();
-            mostrarModalPago(data.idPedido, total); // Asegúrate de que 'data.idPedido' esté presente
-        } else {
-            alert('Error al finalizar el pedido.');
-        }
+        
+        if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+        const resultado = await response.json();
+        mostrarModalPago(resultado.idPedido);
     } catch (error) {
         console.error('Error al finalizar pedido:', error);
     }
 }
 
-function cerrarModalPago() {
-        document.getElementById('modal-pago').style.display = 'none';
-    }
-       function mostrarModalPago(idPedido, total) {
-    console.log(idPedido); // Verificar que el ID se pasa correctamente
-    document.getElementById('id-pedido').textContent = idPedido; // Asegúrate de que se esté asignando el ID correctamente
-    document.getElementById('total-pedido').textContent = total.toFixed(2);
-    document.getElementById('concepto-pedido').textContent = Pedido-${idPedido};
-
-    // Mostrar el modal después de asignar los valores
+function mostrarModalPago(idPedido) {
+    document.getElementById('concepto-pedido').textContent = `Pedido-${idPedido}`;
     document.getElementById('modal-pago').style.display = 'block';
 }
 
-        
-
-        // Iniciar carga de productos al cargar la página
-        cargarProductos();
     </script>
 </body>
 </html>
