@@ -165,6 +165,12 @@
             });
         }
 
+        function eliminarProductoCarrito(index) {
+    carrito.splice(index, 1); // Elimina el producto del array
+    actualizarTablaCarrito(); // Vuelve a renderizar la tabla para reflejar el cambio
+}
+
+
         window.addEventListener('DOMContentLoaded', cargarProductos);
     </script>
 </body>
