@@ -5,20 +5,20 @@ const db = require('../models/config/db'); // Verifica que esté bien configurad
 // Obtener tamaños y precios de una pizza por nombre
 router.get('/obtener-tamanios/:nombre', async (req, res) => {
     const nombre = req.params.nombre;
-    console.log("🔎 Nombre recibido:", nombre);
+    const nombreLimpio = decodeURIComponent(nombre).trim();
 
-    if (!nombre) {
+    console.log("📡 Nombre recibido en la API:", nombre);
+    console.log("🔍 Nombre después de limpiar:", nombreLimpio);
+
+    if (!nombreLimpio) {
         return res.status(400).json({ success: false, message: "Falta el nombre del producto." });
     }
-
-    const nombreLimpio = decodeURIComponent(nombre).trim();
-    console.log("📡 Consultando tamaños para:", nombreLimpio);
 
     const query = 'SELECT TRIM(Tamanio) AS Tamanio, Precio FROM producto WHERE LOWER(TRIM(Nombre)) = LOWER(TRIM(?))';
 
     try {
-        // Aquí aseguramos que db es un pool de conexiones con promesas
         const [rows] = await db.query(query, [nombreLimpio]);
+        console.log("📋 Datos obtenidos de la BD:", rows);
 
         if (rows.length === 0) {
             return res.status(404).json({ success: false, message: "No se encontraron tamaños para este producto." });
@@ -26,8 +26,14 @@ router.get('/obtener-tamanios/:nombre', async (req, res) => {
 
         res.json({ success: true, tamanios: rows });
     } catch (error) {
-        console.error("❌ Error en la consulta:", error);
-        res.status(500).json({ success: false, message: "Error en el servidor.", error: error.message });
+        console.error("❌ Error en la consulta SQL:", error);
+        res.status(500).json({
+            success: false,
+            message: "Error en el servidor.",
+            error: error.message,
+            sqlState: error.sqlState || "N/A",
+            code: error.code || "N/A"
+        });
     }
 });
 
