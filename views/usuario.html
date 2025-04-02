@@ -78,14 +78,14 @@
     </div>
 </div>
 
-    <script>
+        <script>
         let carrito = [];
         let productoSeleccionado = null;
 
         async function cargarProductos() {
             try {
                 const response = await fetch('/api/cliente/obteners-productos');
-                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+                if (!response.ok) throw new Error(Error ${response.status}: ${response.statusText});
 
                 const data = await response.json();
                 if (data.success) {
@@ -104,18 +104,18 @@
 
             productos.forEach(producto => {
                 const fila = document.createElement('tr');
-                fila.innerHTML = `
+                fila.innerHTML = 
                     <td>${producto.Nombre}</td>
                     <td><button onclick="cargarTamanios('${producto.Nombre}')">Añadir</button></td>
-                `;
+                ;
                 tabla.appendChild(fila);
             });
         }
 
         async function cargarTamanios(nombre) {
             try {
-                const response = await fetch(`/api/cliente/obtener-tamanios/${nombre}`);
-                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+                const response = await fetch(/api/cliente/obtener-tamanios/${nombre});
+                if (!response.ok) throw new Error(Error ${response.status}: ${response.statusText});
 
                 const data = await response.json();
                 if (data.success) {
@@ -136,7 +136,7 @@
             tamanios.forEach(tamanio => {
                 const opcion = document.createElement('option');
                 opcion.value = tamanio.Tamanio;
-                opcion.textContent = `${tamanio.Tamanio} - $${tamanio.Precio}`;
+                opcion.textContent = ${tamanio.Tamanio} - $${tamanio.Precio};
                 selectTamanio.appendChild(opcion);
             });
 
@@ -168,14 +168,14 @@
             carrito.forEach((producto, index) => {
                 const totalProducto = producto.precio * producto.cantidad;
                 const fila = document.createElement('tr');
-                fila.innerHTML = `
+                fila.innerHTML = 
                     <td>${producto.nombre}</td>
                     <td>${producto.tamanio}</td>
                     <td>$${producto.precio.toFixed(2)}</td>
                     <td><input type="number" value="${producto.cantidad}" min="1" onchange="actualizarCantidad(${index}, this.value)"></td>
                     <td>$${totalProducto.toFixed(2)}</td>
                     <td><button onclick="eliminarProductoCarrito(${index})">Eliminar</button></td>
-                `;
+                ;
                 tablaCarrito.appendChild(fila);
             });
 
@@ -193,41 +193,59 @@
             }
         }
 
-        // Función para finalizar el pedido y mostrar el modal de pago
-async function finalizarPedido() {
+        async function finalizarPedido() {
+    if (carrito.length === 0) {
+        alert("El carrito está vacío. Agrega productos antes de finalizar.");
+        return;
+    }
+
+    const estado = "En preparación";
+    const idCliente = 1; // Cambia este valor según el ID del cliente actual
+    const descripcion = carrito.map(item => ${item.cantidad}x ${item.nombre} (${item.tamanio})).join(', ');
+    const total = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+
     try {
-        const response = await fetch('http://localhost:3000/agregar-pedido-cliente', {
+        const response = await fetch('/api/cliente/agregar-pedido-cliente', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ /* Datos del pedido */ })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id_cliente: idCliente,
+                descripcion: descripcion,
+                total: total,
+                estado: estado
+            })
         });
-        
+
+        if (!response.ok) throw new Error(Error ${response.status}: ${response.statusText});
+
         const data = await response.json();
-        
+        console.log(data); // Aquí para depurar la respuesta de la API
+
         if (data.success) {
-            console.log("✅ Pedido realizado con éxito, ID:", data.id_pedido);
-            mostrarModalPago(data.id_pedido, total); // Corrección aquí
+            alert('Pedido finalizado con éxito.');
+            carrito = [];
+            actualizarTablaCarrito();
+            mostrarModalPago(data.idPedido, total); // Asegúrate de que 'data.idPedido' esté presente
         } else {
-            console.error("❌ Error en el pedido:", data.message);
+            alert('Error al finalizar el pedido.');
         }
     } catch (error) {
-        console.error("⚠️ Error en la solicitud:", error);
+        console.error('Error al finalizar pedido:', error);
     }
 }
-
-// Función para mostrar el modal de pago con el ID del pedido
-function mostrarModalPago(idPedido, total) {
-    console.log("🛑 ID del Pedido recibido en mostrarModalPago:", idPedido); // Depuración
-    document.getElementById('id-pedido').textContent = idPedido;
-    document.getElementById('modal-pago').style.display = 'block';
-}
-
 
 function cerrarModalPago() {
         document.getElementById('modal-pago').style.display = 'none';
     }
+       function mostrarModalPago(idPedido, total) {
+    console.log(idPedido); // Verificar que el ID se pasa correctamente
+    document.getElementById('id-pedido').textContent = idPedido; // Asegúrate de que se esté asignando el ID correctamente
+    document.getElementById('total-pedido').textContent = total.toFixed(2);
+    document.getElementById('concepto-pedido').textContent = Pedido-${idPedido};
+
+    // Mostrar el modal después de asignar los valores
+    document.getElementById('modal-pago').style.display = 'block';
+}
 
         
 
