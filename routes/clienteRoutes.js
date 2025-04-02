@@ -64,16 +64,17 @@ router.get('/obtener-pedidos-cliente/:id_cliente', (req, res) => {
 });
 
 // Obtener productos
-router.get('/obteners-productos', (req, res) => {
-    const query = 'SELECT ID_Producto, Nombre FROM producto'; // No incluir Tamanio ni Precio aquí
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error('Error al obtener productos:', err);
-            return res.status(500).json({ success: false, message: 'Error al obtener productos' });
-        }
-        res.json({ success: true, productos: results });
-    });
+router.get('/obteners-productos', async (req, res) => {
+    try {
+        const query = 'SELECT DISTINCT Nombre FROM producto';
+        const [productos] = await db.query(query);
+        res.json({ success: true, productos });
+    } catch (error) {
+        console.error("Error al obtener productos:", error);
+        res.status(500).json({ success: false, message: "Error en el servidor" });
+    }
 });
+
 
 
 
