@@ -2,7 +2,20 @@ const express = require('express');
 const router = express.Router();
 const db = require('../models/config/db'); // Verifica que esté bien configurado
 
-// Agregar un pedido
+router.get('/obtener-tamanios/:nombre', async (req, res) => {
+    const nombre = req.params.nombre;
+    try {
+        const query = 'SELECT Tamanio, Precio FROM producto WHERE Nombre = ?';
+        const [tamanios] = await db.query(query, [nombre]);
+
+        res.json({ success: true, tamanios });
+    } catch (error) {
+        console.error("Error al obtener tamaños:", error);
+        res.status(500).json({ success: false, message: "Error en el servidor" });
+    }
+});
+
+
 // Agregar un pedido
 router.post('/agregar-pedido-cliente', (req, res) => {
     const { id_cliente, descripcion, total } = req.body;
