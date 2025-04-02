@@ -194,55 +194,54 @@
         }
 
         async function finalizarPedido() {
-            if (carrito.length === 0) {
-                alert("El carrito está vacío. Agrega productos antes de finalizar.");
-                return;
-            }
+    if (carrito.length === 0) {
+        alert("El carrito está vacío. Agrega productos antes de finalizar.");
+        return;
+    }
 
-            const estado = "En preparación";
-            const idCliente = 1; // Cambia este valor según el ID del cliente actual
-            const descripcion = carrito.map(item => `${item.cantidad}x ${item.nombre} (${item.tamanio})`).join(', ');
-            const total = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
+    const estado = "En preparación";
+    const idCliente = 1; // Cambia este valor según el ID del cliente actual
+    const descripcion = carrito.map(item => `${item.cantidad}x ${item.nombre} (${item.tamanio})`).join(', ');
+    const total = carrito.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
 
-            try {
-                const response = await fetch('/api/cliente/agregar-pedido-cliente', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        id_cliente: idCliente,
-                        descripcion: descripcion,
-                        total: total,
-                        estado: estado
-                    })
-                });
+    try {
+        const response = await fetch('/api/cliente/agregar-pedido-cliente', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id_cliente: idCliente,
+                descripcion: descripcion,
+                total: total,
+                estado: estado
+            })
+        });
 
-                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+        if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
 
-                const data = await response.json();
-                if (data.success) {
-                    alert('Pedido finalizado con éxito.');
-                    carrito = [];
-                    actualizarTablaCarrito();
-                    mostrarModalPago(data.idPedido, total);
-                } else {
-                    alert('Error al finalizar el pedido.');
-                }
-            } catch (error) {
-                console.error('Error al finalizar pedido:', error);
-            }
+        const data = await response.json();
+        console.log(data); // Aquí para depurar la respuesta de la API
+
+        if (data.success) {
+            alert('Pedido finalizado con éxito.');
+            carrito = [];
+            actualizarTablaCarrito();
+            mostrarModalPago(data.idPedido, total); // Asegúrate de que 'data.idPedido' esté presente
+        } else {
+            alert('Error al finalizar el pedido.');
         }
+    } catch (error) {
+        console.error('Error al finalizar pedido:', error);
+    }
+}
 
         function mostrarModalPago(idPedido, total) {
-            document.getElementById('id-pedido').textContent = idPedido;
-            document.getElementById('total-pedido').textContent = total.toFixed(2);
-            document.getElementById('concepto-pedido').textContent = idPedido;
+    console.log(idPedido); // Agregar un log aquí también para verificar si 'idPedido' se pasa correctamente
+    document.getElementById('id-pedido').textContent = idPedido;
+    document.getElementById('total-pedido').textContent = total.toFixed(2);
+    document.getElementById('concepto-pedido').textContent = idPedido;
 
-            document.getElementById('modal-pago').style.display = 'block';
-        }
-
-        function cerrarModalPago() {
-            document.getElementById('modal-pago').style.display = 'none';
-        }
+    document.getElementById('modal-pago').style.display = 'block';
+}
 
         // Iniciar carga de productos al cargar la página
         cargarProductos();
