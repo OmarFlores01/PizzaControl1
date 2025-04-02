@@ -30,10 +30,6 @@ router.get('/obtener-tamanios/:nombre', (req, res) => {
     });
 });
 
-
-
-
-
 // Agregar un pedido
 router.post('/agregar-pedido-cliente', (req, res) => {
     const { id_cliente, descripcion, total } = req.body;
@@ -42,9 +38,12 @@ router.post('/agregar-pedido-cliente', (req, res) => {
         return res.status(400).json({ success: false, message: 'Faltan datos del pedido' });
     }
 
-    const query = "INSERT INTO pedidos (ID_Cliente, Descripcion, Total, Estado, Fecha) VALUES (?, ?, ?, 'Pendiente', NOW());";
+    // Establecer el estado como 'En preparación' al agregar el pedido
+    const estado = 'En preparación';
 
-    db.query(query, [id_cliente, descripcion, total], (err, result) => {
+    const query = "INSERT INTO pedidos (ID_Cliente, Descripcion, Total, Estado, Fecha) VALUES (?, ?, ?, ?, NOW());";
+
+    db.query(query, [id_cliente, descripcion, total, estado], (err, result) => {
         if (err) {
             console.error('❌ Error al agregar el pedido:', err.message);
             return res.status(500).json({ success: false, message: 'Error al realizar el pedido' });
@@ -123,6 +122,7 @@ router.post('/finalizar', (req, res) => {
         return res.status(400).json({ success: false, message: 'Error en el cálculo del total del pedido.' });
     }
 
+    // Establecer el estado como 'En preparación' al finalizar el pedido
     const query = "INSERT INTO pedidos (ID_Cliente, Descripcion, Estado, Fecha, Total, ID_Empleado) VALUES (?, ?, 'En preparación', NOW(), ?, NULL);";
 
     db.query(query, [id_cliente, descripcion, total], (err, result) => {
