@@ -4,7 +4,7 @@ const db = require('../models/config/db'); // Verifica que esté bien configurad
 
 // Obtener tamaños y precios de una pizza por nombre
 router.get('/obtener-tamanios/:nombre', async (req, res) => {
-    const nombre = req.params.nombre.trim(); // Eliminar espacios extra
+    const nombre = req.params.nombre.trim();  // Eliminar espacios extra
 
     try {
         console.log("📌 Buscando tamaños para:", nombre);
@@ -20,9 +20,10 @@ router.get('/obtener-tamanios/:nombre', async (req, res) => {
         res.json({ success: true, tamanios });
     } catch (error) {
         console.error("❌ Error en la API /obtener-tamanios:", error);
-        res.status(500).json({ success: false, message: "Error interno del servidor", error: error.message });
+        res.status(500).json({ success: false, message: "Error interno del servidor", error: error.stack });
     }
 });
+
 
 
 // Agregar un pedido
