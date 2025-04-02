@@ -35,6 +35,50 @@
         </table>
     </div>
 
+        <div class="container cart-container">
+        <h1>Carrito de Compras</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Tamaño</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Total</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="carrito-lista">
+                <!-- Productos en el carrito -->
+            </tbody>
+        </table>
+        <button id="btn-finalizar" onclick="finalizarPedido()" disabled>Finalizar Pedido</button>
+                <button id="btn-finalizar"><a href="pedidos.html">Ver Pedidos</a></button>
+    </div>
+
+    <!-- Modal para seleccionar el tamaño -->
+    <div id="modal-seleccion" class="modal">
+        <div class="modal-content">
+            <h2>Seleccione el Tamaño</h2>
+            <select id="select-tamanio"></select>
+            <button id="btn-confirmar-tamanio">Confirmar</button>
+        </div>
+    </div>
+
+    <!-- Modal de pago -->
+    <div id="modal-pago" class="modal">
+    <div class="modal-content">
+        <h2>Detalles de Pago</h2>
+        <p><strong>ID del pedido:</strong> <span id="id-pedido"></span></p>
+        <p><strong>Cuenta de transferencia:</strong> 876543234567876</p>
+        <p><strong>Total:</strong> $<span id="total-pedido"></span></p>
+        <p><strong>Enviar captura de la transferencia al número:</strong> 5565544395</p>
+        <p><strong>Concepto:</strong> Pedido-<span id="concepto-pedido"></span></p>
+        <button onclick="cerrarModalPago()">Cerrar</button>
+    </div>
+</div>
+
+
     <script>
         async function cargarProductos() {
             try {
