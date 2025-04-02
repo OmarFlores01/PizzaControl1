@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../models/config/db'); // Verifica que esté bien configurado
 
+
 router.get('/obtener-tamanios/:nombre', async (req, res) => {
     const nombre = req.params.nombre;
     try {
