@@ -78,16 +78,6 @@
         </div>
     </div>
 
-    <!-- Selección de Estado del Pedido -->
-    <div class="container">
-        <h2>Estado del Pedido</h2>
-        <select id="select-estado">
-            <option value="En preparación">En preparación</option>
-            <option value="Listo">Listo</option>
-            <option value="Entregado">Entregado</option>
-        </select>
-    </div>
-
     <script>
         let carrito = [];
         let productoSeleccionado = null;
@@ -199,13 +189,8 @@
                 return;
             }
 
-            // Validación del estado
-            const estado = document.getElementById('select-estado').value;
-            const estadosValidos = ['En preparación', 'Listo', 'Entregado'];
-            if (!estadosValidos.includes(estado)) {
-                alert("El estado seleccionado no es válido.");
-                return;
-            }
+            // El estado se asigna siempre a "En preparación"
+            const estado = "En preparación";
 
             // Simulación de ID de cliente (esto debe ser dinámico, usando el ID del usuario actual)
             const idCliente = 1; // Cambia este valor según el ID del cliente actual
@@ -225,7 +210,7 @@
                         id_cliente: idCliente,
                         descripcion: descripcion,
                         total: total,
-                        estado: estado // Enviar el estado con el pedido
+                        estado: estado // El estado siempre será "En preparación"
                     })
                 });
 
