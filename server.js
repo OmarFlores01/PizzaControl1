@@ -41,14 +41,13 @@ app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
 
     // Prueba de conexión a la base de datos
-    async function testDBConnection() {
-    try {
-        const [result] = await db.query('SELECT 1');  // ✅ Correcto con Promises
-        console.log('✅ Conexión a la base de datos exitosa.');
-    } catch (err) {
+    db.query('SELECT 1', (err, result) => {
+    if (err) {
         console.error('❌ Error en la consulta:', err);
+    } else {
+        console.log('✅ Conexión a la base de datos exitosa.');
     }
-}
-testDBConnection();
+});
+
 
 });
