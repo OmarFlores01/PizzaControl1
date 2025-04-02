@@ -55,6 +55,7 @@
         <button id="btn-finalizar" onclick="finalizarPedido()" disabled>Finalizar Pedido</button>
     </div>
 
+    <!-- Modal para seleccionar el tamaño -->
     <div id="modal-seleccion" class="modal">
         <div class="modal-content">
             <h2>Seleccione el Tamaño</h2>
@@ -63,6 +64,7 @@
         </div>
     </div>
 
+    <!-- Modal de pago -->
     <div id="modal-pago" class="modal">
         <div class="modal-content">
             <h2>Detalles de Pago</h2>
@@ -74,6 +76,16 @@
             <button onclick="cerrarModalPago()">Cerrar</button>
             <button><a href="pedidos.html">Ver Pedidos</a></button>
         </div>
+    </div>
+
+    <!-- Selección de Estado del Pedido -->
+    <div class="container">
+        <h2>Estado del Pedido</h2>
+        <select id="select-estado">
+            <option value="En preparación">En preparación</option>
+            <option value="Listo">Listo</option>
+            <option value="Entregado">Entregado</option>
+        </select>
     </div>
 
     <script>
@@ -187,6 +199,14 @@
                 return;
             }
 
+            // Validación del estado
+            const estado = document.getElementById('select-estado').value;
+            const estadosValidos = ['En preparación', 'Listo', 'Entregado'];
+            if (!estadosValidos.includes(estado)) {
+                alert("El estado seleccionado no es válido.");
+                return;
+            }
+
             // Simulación de ID de cliente (esto debe ser dinámico, usando el ID del usuario actual)
             const idCliente = 1; // Cambia este valor según el ID del cliente actual
 
@@ -204,57 +224,42 @@
                     body: JSON.stringify({
                         id_cliente: idCliente,
                         descripcion: descripcion,
-                        total: total
+                        total: total,
+                        estado: estado // Enviar el estado con el pedido
                     })
                 });
 
+                if (!response.ok) throw new Error(`Error ${response.status}: ${response.statusText}`);
+
                 const data = await response.json();
                 if (data.success) {
-                    // Llenar datos en el modal
-                    document.getElementById("id-pedido").textContent = data.id_pedido;
-                    document.getElementById("total-pedido").textContent = total.toFixed(2);
-                    document.getElementById("concepto-pedido").textContent = data.id_pedido;
-
-                    // Mostrar el modal de pago
-                    document.getElementById("modal-pago").style.display = "block";
-
-                    // Vaciar carrito después de finalizar pedido
+                    alert('Pedido finalizado con éxito.');
+                    // Limpiar carrito y mostrar la información de pago
                     carrito = [];
                     actualizarTablaCarrito();
+                    mostrarModalPago(data.idPedido, total);
                 } else {
-                    alert("Error al realizar el pedido: " + data.message);
+                    alert('Error al finalizar el pedido.');
                 }
             } catch (error) {
-                console.error("Error al finalizar el pedido:", error);
-                alert("Hubo un problema al procesar el pedido.");
+                console.error('Error al finalizar pedido:', error);
             }
         }
 
-        function eliminarProductoCarrito(index) {
-            carrito.splice(index, 1); // Elimina el producto del array
-            actualizarTablaCarrito(); // Vuelve a renderizar la tabla para reflejar el cambio
+        function mostrarModalPago(idPedido, total) {
+            document.getElementById('id-pedido').textContent = idPedido;
+            document.getElementById('total-pedido').textContent = total.toFixed(2);
+            document.getElementById('concepto-pedido').textContent = idPedido;
+
+            document.getElementById('modal-pago').style.display = 'block';
         }
 
         function cerrarModalPago() {
-            document.getElementById("modal-pago").style.display = "none";
+            document.getElementById('modal-pago').style.display = 'none';
         }
 
-        function actualizarCantidad(index, cantidad) {
-            // Asegurarse de que la cantidad sea un número válido y mayor que 0
-            cantidad = parseInt(cantidad);
-            if (isNaN(cantidad) || cantidad <= 0) {
-                alert("La cantidad debe ser un número mayor a 0.");
-                return;
-            }
-
-            // Actualizar la cantidad en el carrito
-            carrito[index].cantidad = cantidad;
-
-            // Actualizar la tabla del carrito
-            actualizarTablaCarrito();
-        }
-
-        window.addEventListener('DOMContentLoaded', cargarProductos);
+        // Iniciar carga de productos al cargar la página
+        cargarProductos();
     </script>
 </body>
 </html>
