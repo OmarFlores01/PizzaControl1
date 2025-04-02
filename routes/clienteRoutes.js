@@ -3,39 +3,33 @@ const router = express.Router();
 const db = require('../models/config/db'); // Verifica que esté bien configurado
 
 // Obtener tamaños y precios de una pizza por nombre
-router.get('/obtener-tamanios/:nombre', async (req, res) => {
+router.get('/obtener-tamanios/:nombre', (req, res) => {
     const nombre = req.params.nombre;
-    const nombreLimpio = decodeURIComponent(nombre).trim();
-
     console.log("📡 Nombre recibido en la API:", nombre);
-    console.log("🔍 Nombre después de limpiar:", nombreLimpio);
 
-    if (!nombreLimpio) {
+    if (!nombre) {
         return res.status(400).json({ success: false, message: "Falta el nombre del producto." });
     }
 
+    const nombreLimpio = decodeURIComponent(nombre).trim();
+    console.log("🔍 Nombre después de limpiar:", nombreLimpio);
+
     const query = 'SELECT TRIM(Tamanio) AS Tamanio, Precio FROM producto WHERE LOWER(TRIM(Nombre)) = LOWER(TRIM(?))';
 
-    try {
-        const [rows] = await db.query(query, [nombreLimpio]);
-        console.log("📋 Datos obtenidos de la BD:", rows);
+    db.query(query, [nombreLimpio], (error, results) => {
+        if (error) {
+            console.error("❌ Error en la consulta SQL:", error);
+            return res.status(500).json({ success: false, message: "Error en el servidor.", error: error.message });
+        }
 
-        if (rows.length === 0) {
+        if (results.length === 0) {
             return res.status(404).json({ success: false, message: "No se encontraron tamaños para este producto." });
         }
 
-        res.json({ success: true, tamanios: rows });
-    } catch (error) {
-        console.error("❌ Error en la consulta SQL:", error);
-        res.status(500).json({
-            success: false,
-            message: "Error en el servidor.",
-            error: error.message,
-            sqlState: error.sqlState || "N/A",
-            code: error.code || "N/A"
-        });
-    }
+        res.json({ success: true, tamanios: results });
+    });
 });
+
 
 
 
