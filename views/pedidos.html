@@ -51,23 +51,23 @@
         });
 
         function mostrarPedidosEnPantalla(pedidos) {
-            const tablaPedidos = document.getElementById("tabla-pedidos");
+    const tablaPedidos = document.getElementById("tabla-pedidos");
 
-            if (!tablaPedidos) {
-                console.error("❌ Error: No se encontró el elemento 'tabla-pedidos'.");
-                return;
-            }
+    if (!tablaPedidos) {
+        console.error("❌ Error: No se encontró el elemento 'tabla-pedidos'.");
+        return;
+    }
 
-            tablaPedidos.innerHTML = pedidos.map(pedido => `
-                <tr>
-                    <td>${pedido.ID_Pedido}</td>
-                    <td>${pedido.Descripcion}</td>
-                    <td>$${pedido.Total.toFixed(2)}</td>
-                    <td>${pedido.Estado}</td>
-                    <td>${new Date(pedido.Fecha).toLocaleDateString("es-MX")}</td>
-                </tr>
-            `).join('');
-        }
+    tablaPedidos.innerHTML = pedidos.map(pedido => `
+        <tr>
+            <td>${pedido.ID_Pedido}</td>
+            <td>${pedido.Descripcion}</td>
+            <td>$${parseFloat(pedido.Total).toFixed(2)}</td>
+            <td>${pedido.Estado}</td>
+            <td>${new Date(pedido.Fecha).toLocaleDateString("es-MX")}</td>
+        </tr>
+    `).join('');
+}
 
         function obtenerIdCliente() {
             // Se intenta obtener de la URL
