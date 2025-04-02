@@ -3,26 +3,33 @@ const router = express.Router();
 const db = require('../models/config/db'); // Verifica que esté bien configurado
 
 // Obtener tamaños y precios de una pizza por nombre
-router.get('/obtener-tamanios/:nombre', async (req, res) => {
-    const nombre = req.params.nombre.trim();  // Eliminar espacios extra
+app.get('/api/cliente/obtener-tamanios/:nombre', async (req, res) => {
+    const nombre = req.params.nombre; // 👈 Aquí tomamos el parámetro de la URL
+    console.log("🔎 Nombre recibido:", nombre);
+    
+    if (!nombre) {
+        return res.status(400).json({ success: false, message: "Falta el nombre del producto." });
+    }
 
+    const nombreLimpio = decodeURIComponent(nombre).trim();
+    console.log("📡 Consultando tamaños para:", nombreLimpio);
+
+    const query = 'SELECT TRIM(Tamanio) AS Tamanio, Precio FROM producto WHERE LOWER(TRIM(Nombre)) = LOWER(TRIM(?))';
+    
     try {
-        console.log("📌 Buscando tamaños para:", nombre);
-        const query = 'SELECT TRIM(Tamanio) AS Tamanio, Precio FROM producto WHERE TRIM(Nombre) = ?';
-        const [tamanios] = await db.query(query, [nombre]); // Usando query() con promesas
+        const [rows] = await db.query(query, [nombreLimpio]);
 
-        if (!tamanios || tamanios.length === 0) {
-            console.warn("⚠️ No se encontraron tamaños para:", nombre);
-            return res.status(404).json({ success: false, message: "No se encontraron tamaños" });
+        if (rows.length === 0) {
+            return res.status(404).json({ success: false, message: "No se encontraron tamaños para este producto." });
         }
 
-        console.log("✅ Tamaños encontrados:", tamanios);
-        res.json({ success: true, tamanios });
+        res.json({ success: true, tamanios: rows });
     } catch (error) {
-        console.error("❌ Error en la API /obtener-tamanios:", error);
-        res.status(500).json({ success: false, message: "Error interno del servidor", error: error.stack });
+        console.error("❌ Error en la consulta:", error);
+        res.status(500).json({ success: false, message: "Error en el servidor." });
     }
 });
+
 
 
 
